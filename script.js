@@ -79,7 +79,7 @@ if (!document.querySelector(".chatbot-toggler")) {
 const chatbotToggler = document.querySelector(".chatbot-toggler");
 const chatCloseBtn = document.querySelector(".chat-close-btn");
 const chatInput = document.querySelector(".chat-input textarea");
-const sendChatBtn = document.querySelector(".chat-input span");
+const sendChatBtn = document.getElementById("send-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
@@ -134,7 +134,18 @@ const saveChatHistory = () => {
 const loadChatHistory = () => {
     if (!chatbox) return;
 
-    const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY));
+    const storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    if (!storedHistory) return;
+
+    let history;
+    try {
+        history = JSON.parse(storedHistory);
+    } catch (error) {
+        console.error("Invalid chat history in localStorage:", error);
+        localStorage.removeItem(CHAT_HISTORY_KEY);
+        return;
+    }
+
     if (history && history.length > 0) {
         chatbox.innerHTML = "";
         history.forEach((chat) => {
