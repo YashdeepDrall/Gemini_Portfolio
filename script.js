@@ -1,56 +1,54 @@
-if (document.getElementById('element') && typeof Typed !== 'undefined') {
-    var typed = new Typed('#element', {
-        strings: ['Web Developer', 'Graphic Designer', 'Web Designer', 'Video Editor'],
+if (document.getElementById("element") && typeof Typed !== "undefined") {
+    var typed = new Typed("#element", {
+        strings: ["Web Developer", "Graphic Designer", "Web Designer", "Video Editor"],
         typeSpeed: 50,
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Get the current page URL (excluding query parameters)
-    const currentPage = window.location.pathname.split('/').pop();
+document.addEventListener("DOMContentLoaded", function () {
+    const currentPage = window.location.pathname.split("/").pop();
+    const navLinks = document.querySelectorAll("nav .nav-link");
+    const sidebarLinks = document.querySelectorAll(".sidebar-link");
 
-    // Select all nav links
-    const navLinks = document.querySelectorAll('nav .nav-link');
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-
-    // Loop through nav links and sidebar links to add 'active' class to the current page
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPage || 
-            (currentPage === '' && link.getAttribute('href') === 'index.html')) {
-            link.classList.add('active');
+    navLinks.forEach((link) => {
+        if (
+            link.getAttribute("href") === currentPage ||
+            (currentPage === "" && link.getAttribute("href") === "index.html")
+        ) {
+            link.classList.add("active");
         }
     });
 
-    sidebarLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPage || 
-            (currentPage === '' && link.getAttribute('href') === 'index.html')) {
-            link.classList.add('active');
+    sidebarLinks.forEach((link) => {
+        if (
+            link.getAttribute("href") === currentPage ||
+            (currentPage === "" && link.getAttribute("href") === "index.html")
+        ) {
+            link.classList.add("active");
         }
     });
 
-    // Add click event to hamburger menu
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const hamburgerMenu = document.getElementById("hamburgerMenu");
     if (hamburgerMenu) {
-        hamburgerMenu.addEventListener('click', function () {
-            document.getElementById('sidebar').classList.add('active');
+        hamburgerMenu.addEventListener("click", function () {
+            document.getElementById("sidebar").classList.add("active");
         });
     }
 
-    // Add click event to close button
-    const closeSidebar = document.getElementById('closeSidebar');
+    const closeSidebar = document.getElementById("closeSidebar");
     if (closeSidebar) {
-        closeSidebar.addEventListener('click', function () {
-            document.getElementById('sidebar').classList.remove('active');
+        closeSidebar.addEventListener("click", function () {
+            document.getElementById("sidebar").classList.remove("active");
         });
     }
 });
 
-// Chatbot Logic
-// Inject Chatbot HTML if not present
 if (!document.querySelector(".chatbot-toggler")) {
-    document.body.insertAdjacentHTML("beforeend", `
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        `
         <button class="chatbot-toggler">
-            <span>🤖</span>
+            <span>&#129302;</span>
         </button>
         <div class="chatbot-container">
             <header class="chatbot-header">
@@ -61,8 +59,10 @@ if (!document.querySelector(".chatbot-toggler")) {
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
-                    <span>🤖</span>
-                    <p>Hi there 👋<br>How can I help you with cybersecurity today?</p>
+                    <span>&#129302;</span>
+                    <div class="message-content">
+                        <div class="chat-message">Hi there &#128075;<br>How can I help you with cybersecurity today?</div>
+                    </div>
                 </li>
             </ul>
             <div class="chat-input">
@@ -72,7 +72,8 @@ if (!document.querySelector(".chatbot-toggler")) {
                 </span>
             </div>
         </div>
-    `);
+    `
+    );
 }
 
 const chatbotToggler = document.querySelector(".chatbot-toggler");
@@ -84,34 +85,64 @@ const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
 const API_BASE_URL = "http://127.0.0.1:10000";
 
-// Function to save chat history to localStorage
-const saveChatHistory = () => {
-    const messages = [];
-    chatbox.querySelectorAll(".chat").forEach(chat => {
-        const p = chat.querySelector("p");
-        // Do not save the "Thinking..." animation bubble
-        if (p && p.querySelector(".typing-animation")) return;
+const renderChatMessage = (element, message, className) => {
+    if (!element) return;
 
-        const message = p ? p.textContent : "";
+    const safeMessage = typeof message === "string" ? message : String(message ?? "");
+    element.dataset.rawMessage = safeMessage;
+
+    if (
+        className !== "incoming" ||
+        typeof marked === "undefined" ||
+        typeof DOMPurify === "undefined"
+    ) {
+        element.textContent = safeMessage;
+        return;
+    }
+
+    const rawHtml = marked.parse(safeMessage, { breaks: true });
+    element.innerHTML = DOMPurify.sanitize(rawHtml);
+
+    element.querySelectorAll("a[href]").forEach((link) => {
+        const href = link.getAttribute("href") || "";
+        if (/^https?:\/\//i.test(href)) {
+            link.setAttribute("target", "_blank");
+            link.setAttribute("rel", "noopener noreferrer");
+        }
+    });
+};
+
+const saveChatHistory = () => {
+    if (!chatbox) return;
+
+    const messages = [];
+    chatbox.querySelectorAll(".chat").forEach((chat) => {
+        const messageElement = chat.querySelector(".chat-message");
+        if (messageElement && messageElement.querySelector(".typing-animation")) return;
+
+        const message = messageElement
+            ? messageElement.dataset.rawMessage || messageElement.textContent
+            : "";
         const className = chat.classList.contains("outgoing") ? "outgoing" : "incoming";
         const chatId = chat.getAttribute("data-chat-id") || null;
         messages.push({ message, className, chatId });
     });
+
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
 };
 
-// Function to load chat history from localStorage
 const loadChatHistory = () => {
+    if (!chatbox) return;
+
     const history = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY));
     if (history && history.length > 0) {
-        chatbox.innerHTML = ""; // Clear the initial welcome message
-        history.forEach(chat => {
+        chatbox.innerHTML = "";
+        history.forEach((chat) => {
             const chatLi = createChatLi(chat.message, chat.className);
             if (chat.chatId) {
                 chatLi.setAttribute("data-chat-id", chat.chatId);
             }
-            // Show feedback buttons for loaded incoming messages
-            if (chat.className === 'incoming') {
+            if (chat.className === "incoming") {
                 const feedbackDiv = chatLi.querySelector(".chat-feedback");
                 if (feedbackDiv) feedbackDiv.classList.add("active");
             }
@@ -119,9 +150,9 @@ const loadChatHistory = () => {
         });
         chatbox.scrollTo(0, chatbox.scrollHeight);
     }
-}
+};
 
-if (chatCloseBtn) {
+if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
 
     const clearChatBtn = document.createElement("span");
@@ -146,42 +177,47 @@ if (chatCloseBtn) {
         }
     });
 
-    // Draggable Logic
     const chatbotHeader = document.querySelector(".chatbot-header");
-    let isDragging = false, startX, startY, startLeft, startTop;
+    let isDragging = false;
+    let startX;
+    let startY;
+    let startLeft;
+    let startTop;
 
-    const onDrag = (e) => {
+    const onDrag = (event) => {
         if (!isDragging) return;
-        chatbotContainer.style.left = `${startLeft + (e.clientX - startX)}px`;
-        chatbotContainer.style.top = `${startTop + (e.clientY - startY)}px`;
-    }
+        chatbotContainer.style.left = `${startLeft + (event.clientX - startX)}px`;
+        chatbotContainer.style.top = `${startTop + (event.clientY - startY)}px`;
+    };
 
     const stopDrag = () => {
         isDragging = false;
         chatbotContainer.style.transition = "";
         document.removeEventListener("mousemove", onDrag);
         document.removeEventListener("mouseup", stopDrag);
+    };
+
+    if (chatbotHeader) {
+        chatbotHeader.addEventListener("mousedown", (event) => {
+            if (event.target.closest("span") || event.target.closest("button")) return;
+            isDragging = true;
+            chatbotContainer.style.transition = "none";
+
+            const rect = chatbotContainer.getBoundingClientRect();
+            chatbotContainer.style.right = "auto";
+            chatbotContainer.style.bottom = "auto";
+            chatbotContainer.style.left = `${rect.left}px`;
+            chatbotContainer.style.top = `${rect.top}px`;
+
+            startX = event.clientX;
+            startY = event.clientY;
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            document.addEventListener("mousemove", onDrag);
+            document.addEventListener("mouseup", stopDrag);
+        });
     }
-
-    chatbotHeader.addEventListener("mousedown", (e) => {
-        if(e.target.closest("span") || e.target.closest("button")) return;
-        isDragging = true;
-        chatbotContainer.style.transition = "none";
-        
-        const rect = chatbotContainer.getBoundingClientRect();
-        chatbotContainer.style.right = "auto";
-        chatbotContainer.style.bottom = "auto";
-        chatbotContainer.style.left = `${rect.left}px`;
-        chatbotContainer.style.top = `${rect.top}px`;
-
-        startX = e.clientX;
-        startY = e.clientY;
-        startLeft = rect.left;
-        startTop = rect.top;
-
-        document.addEventListener("mousemove", onDrag);
-        document.addEventListener("mouseup", stopDrag);
-    });
 
     const initialChatContent = chatbox.innerHTML;
     clearChatBtn.addEventListener("click", () => {
@@ -196,21 +232,26 @@ const sendFeedback = (chatId, feedback) => {
     fetch(`${API_BASE_URL}/feedback`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             chat_id: chatId,
-            feedback: feedback
-        })
-    }).catch(err => console.error("Error sending feedback:", err));
-}
+            feedback: feedback,
+        }),
+    }).catch((error) => console.error("Error sending feedback:", error));
+};
 
 const createChatLi = (message, className) => {
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", className);
-    let chatContent = className === "outgoing" ? `<p></p>` : `<span>🤖</span><div class="message-content"><p></p><div class="chat-feedback"><button class="feedback-btn like" data-tooltip="Good response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button><button class="feedback-btn dislike" data-tooltip="Bad response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button><button class="feedback-btn copy" data-tooltip="Copy response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><span class="feedback-text"></span></div></div>`;
+
+    const chatContent =
+        className === "outgoing"
+            ? `<div class="chat-message"></div>`
+            : `<span>&#129302;</span><div class="message-content"><div class="chat-message"></div><div class="chat-feedback"><button class="feedback-btn like" data-tooltip="Good response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button><button class="feedback-btn dislike" data-tooltip="Bad response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button><button class="feedback-btn copy" data-tooltip="Copy response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><span class="feedback-text"></span></div></div>`;
+
     chatLi.innerHTML = chatContent;
-    chatLi.querySelector("p").textContent = message;
+    renderChatMessage(chatLi.querySelector(".chat-message"), message, className);
 
     if (className === "incoming") {
         const feedbackText = chatLi.querySelector(".feedback-text");
@@ -227,12 +268,15 @@ const createChatLi = (message, className) => {
                 likeBtn.classList.add("active");
                 dislikeBtn.classList.remove("active");
                 feedbackText.textContent = "Feedback submitted";
-                setTimeout(() => feedbackText.textContent = "", 2000);
+                setTimeout(() => {
+                    feedbackText.textContent = "";
+                }, 2000);
                 if (chatId) {
                     sendFeedback(chatId, "like");
                 }
             }
         });
+
         dislikeBtn.addEventListener("click", () => {
             const chatId = chatLi.getAttribute("data-chat-id");
             if (dislikeBtn.classList.contains("active")) {
@@ -242,52 +286,59 @@ const createChatLi = (message, className) => {
                 dislikeBtn.classList.add("active");
                 likeBtn.classList.remove("active");
                 feedbackText.textContent = "Feedback submitted";
-                setTimeout(() => feedbackText.textContent = "", 2000);
+                setTimeout(() => {
+                    feedbackText.textContent = "";
+                }, 2000);
                 if (chatId) {
                     sendFeedback(chatId, "dislike");
                 }
             }
         });
+
         copyBtn.addEventListener("click", () => {
             if (copyBtn.classList.contains("active")) {
                 copyBtn.classList.remove("active");
                 feedbackText.textContent = "";
             } else {
-                const text = chatLi.querySelector("p").textContent;
+                const text = chatLi.querySelector(".chat-message").textContent;
                 navigator.clipboard.writeText(text).then(() => {
                     copyBtn.classList.add("active");
                     feedbackText.textContent = "Response copied";
-                    setTimeout(() => feedbackText.textContent = "", 2000);
+                    setTimeout(() => {
+                        feedbackText.textContent = "";
+                    }, 2000);
                 });
             }
         });
     }
+
     return chatLi;
-}
+};
 
 const generateResponse = (chatElement) => {
     const API_URL = `${API_BASE_URL}/ask`;
-    const messageElement = chatElement.querySelector("p");
+    const messageElement = chatElement.querySelector(".chat-message");
 
     const requestOptions = {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "accept": "application/json"
+            accept: "application/json",
         },
         body: JSON.stringify({
             question: userMessage,
-            k: 3
-        })
-    }
+            k: 3,
+        }),
+    };
 
     fetch(API_URL, requestOptions)
-        .then(res => {
+        .then((res) => {
             if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
             return res.json();
         })
-        .then(data => {
-            messageElement.textContent = data.answer || data.response || JSON.stringify(data);
+        .then((data) => {
+            const botReply = data.answer || data.response || JSON.stringify(data);
+            renderChatMessage(messageElement, botReply, "incoming");
             if (data.chat_id) {
                 chatElement.setAttribute("data-chat-id", data.chat_id);
             }
@@ -298,20 +349,28 @@ const generateResponse = (chatElement) => {
         .catch((error) => {
             console.error("Chatbot Error:", error);
             if (error.message === "Failed to fetch") {
-                messageElement.textContent = "Error: Cannot connect to server. Ensure Python backend is running & CORS is enabled.";
+                renderChatMessage(
+                    messageElement,
+                    "Error: Cannot connect to server. Ensure Python backend is running & CORS is enabled.",
+                    "incoming"
+                );
             } else {
-                messageElement.textContent = "Oops! Something went wrong. Check console (F12) for error.";
+                renderChatMessage(
+                    messageElement,
+                    "Oops! Something went wrong. Check console (F12) for error.",
+                    "incoming"
+                );
             }
             const feedbackDiv = chatElement.querySelector(".chat-feedback");
             if (feedbackDiv) feedbackDiv.classList.add("active");
             saveChatHistory();
         })
         .finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
-}
+};
 
 const handleChat = () => {
     userMessage = chatInput.value.trim();
-    if(!userMessage) return;
+    if (!userMessage) return;
 
     chatInput.value = "";
     chatInput.style.height = "auto";
@@ -322,7 +381,7 @@ const handleChat = () => {
 
     setTimeout(() => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
-        const messageElement = incomingChatLi.querySelector("p");
+        const messageElement = incomingChatLi.querySelector(".chat-message");
         messageElement.innerHTML = `<div class="typing-animation">
             <div class="typing-dot" style="--delay: 0.2s"></div>
             <div class="typing-dot" style="--delay: 0.3s"></div>
@@ -332,7 +391,7 @@ const handleChat = () => {
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi);
     }, 600);
-}
+};
 
 if (chatInput) {
     chatInput.addEventListener("input", () => {
@@ -340,23 +399,26 @@ if (chatInput) {
         chatInput.style.height = `${chatInput.scrollHeight}px`;
     });
 
-    chatInput.addEventListener("keydown", (e) => {
-        if(e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
-            e.preventDefault();
+    chatInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey && window.innerWidth > 800) {
+            event.preventDefault();
             handleChat();
         }
     });
 }
 
 if (sendChatBtn) sendChatBtn.addEventListener("click", handleChat);
-if (chatbotToggler) chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
-if (chatCloseBtn) chatCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+if (chatbotToggler) {
+    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+}
+if (chatCloseBtn) {
+    chatCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+}
 
 if (chatbox) {
     loadChatHistory();
 }
 
-// Automatically open the chatbot after 3 seconds (once per session)
 if (!sessionStorage.getItem("chatbotOpened")) {
     setTimeout(() => {
         document.body.classList.add("show-chatbot");

@@ -23,7 +23,7 @@
                 <li><a href="projects.html" class="nav-link" data-page="projects">Projects</a></li>
                 <li><a href="contact.html" class="nav-link" data-page="contact">Contact Me</a></li>
             </ul>
-            <div class="hamburger" id="hamburgerMenu">&#9776;</div> <!-- Hamburger icon -->
+            <div class="hamburger" id="hamburgerMenu">&#9776;</div>
         </nav>
     </header>
 
@@ -159,26 +159,30 @@
 
     <!-- Chatbot HTML -->
     <button class="chatbot-toggler">
-        <span style="font-size: 1.5rem;">🤖</span>
+        <span style="font-size: 1.5rem;">&#129302;</span>
     </button>
     <div class="chatbot-container">
         <header class="chatbot-header">
             <h2>AI Assistant</h2>
-            <span class="chat-close-btn">×</span>
+            <span class="chat-close-btn">&times;</span>
         </header>
         <ul class="chatbox">
             <li class="chat incoming">
-                <span>🤖</span>
-                <p>Hi there 👋<br>How can I help you with cybersecurity today?</p>
+                <span>&#129302;</span>
+                <div class="message-content">
+                    <div class="chat-message">Hi there &#128075;<br>How can I help you with cybersecurity today?</div>
+                </div>
             </li>
         </ul>
         <div class="chat-input">
             <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
-            <span id="send-btn">➤</span>
+            <span id="send-btn">&#10148;</span>
         </div>
     </div>
 
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
     <!-- Setup and start animation! -->
     <script src="script.js"></script>
 </body>

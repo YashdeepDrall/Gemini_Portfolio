@@ -508,8 +508,7 @@ body.show-chatbot .chatbot-toggler::after {
     justify-content: flex-end;
     margin-bottom: 15px;
 }
-.chatbox .chat p {
-    white-space: pre-wrap;
+.chatbox .chat .chat-message {
     padding: 10px 14px;
     border-radius: 10px 10px 0 10px;
     max-width: 75%;
@@ -517,8 +516,9 @@ body.show-chatbot .chatbot-toggler::after {
     font-size: 0.95rem;
     background: rgb(109, 109, 238);
     margin: 0;
+    overflow-wrap: anywhere;
 }
-.chatbox .incoming p {
+.chatbox .incoming .chat-message {
     border-radius: 10px 10px 10px 0;
     color: #fff;
     background: rgb(60, 60, 100);
@@ -559,8 +559,40 @@ body.show-chatbot .chatbot-toggler::after {
     max-width: 75%;
 }
 
-.chatbox .incoming .message-content p {
+.chatbox .incoming .message-content .chat-message {
     max-width: 100%;
+}
+
+.chatbox .chat .chat-message > :first-child {
+    margin-top: 0;
+}
+
+.chatbox .chat .chat-message > :last-child {
+    margin-bottom: 0;
+}
+
+.chatbox .chat .chat-message p,
+.chatbox .chat .chat-message ul,
+.chatbox .chat .chat-message ol,
+.chatbox .chat .chat-message h1,
+.chatbox .chat .chat-message h2,
+.chatbox .chat .chat-message h3,
+.chatbox .chat .chat-message h4 {
+    margin: 0 0 0.6rem;
+}
+
+.chatbox .chat .chat-message ul,
+.chatbox .chat .chat-message ol {
+    padding-left: 1.2rem;
+}
+
+.chatbox .chat .chat-message a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.chatbox .chat .chat-message strong {
+    font-weight: 600;
 }
 
 .chat-feedback {
