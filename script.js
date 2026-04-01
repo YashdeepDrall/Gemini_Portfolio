@@ -83,7 +83,7 @@ const sendChatBtn = document.getElementById("send-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
-const API_BASE_URL = "http://127.0.0.1:10000";
+const API_BASE_URL = "https://iiris-bot.vercel.app";
 
 const renderChatMessage = (element, message, className) => {
     if (!element) return;
