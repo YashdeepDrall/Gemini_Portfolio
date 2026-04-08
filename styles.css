@@ -314,14 +314,15 @@ footer .footer-rights {
     transform: scale(1.1);
 }
 
-.chatbot-toggler span {
-    display: inline-block;
-    animation: wave 2.5s infinite;
-    transform-origin: 70% 70%;
+.chatbot-toggler img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .chatbot-toggler::after {
-    content: "Chat with me😊";
+    content: "Chat with me👋";
     position: absolute;
     bottom: 100%;
     left: 50%;
@@ -402,7 +403,7 @@ body.show-chatbot .chatbot-container {
 body.show-chatbot .chatbot-toggler {
     animation: none;
 }
-body.show-chatbot .chatbot-toggler span {
+body.show-chatbot .chatbot-toggler img {
     animation: none;
 }
 body.show-chatbot .chatbot-toggler::after {
@@ -490,19 +491,13 @@ body.show-chatbot .chatbot-toggler::after {
     list-style: none;
     margin-bottom: 15px;
 }
-.chatbox .incoming > span {
-    width: 32px;
-    height: 32px;
-    color: #fff;
-    background: rgb(109, 109, 238);
-    text-align: center;
-    line-height: 32px;
+.chatbox .incoming > .chatbot-avatar {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
     border-radius: 4px;
     margin-right: 10px;
     align-self: flex-end;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 .chatbox .outgoing {
     justify-content: flex-end;
