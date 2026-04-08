@@ -338,7 +338,7 @@ const generateResponse = (chatElement) => {
         },
         body: JSON.stringify({
             question: userMessage,
-            k: 3,
+            k: 5,
         }),
     };
 
