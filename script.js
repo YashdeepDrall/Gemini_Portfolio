@@ -61,7 +61,19 @@ if (!document.querySelector(".chatbot-toggler")) {
                 <li class="chat incoming">
                     <span>&#129302;</span>
                     <div class="message-content">
-                        <div class="chat-message">Hi there &#128075;<br>How can I help you with cybersecurity today?</div>
+                        <div class="chat-message">
+                            <p>👋 Welcome to IIRIS.</p>
+                            <p>I’m your virtual assistant, here to help with information on our:</p>
+                            <ul>
+                                <li>services</li>
+                                <li>leadership</li>
+                                <li>locations</li>
+                                <li>press releases</li>
+                                <li>media presence</li>
+                                <li>contact information and more.</li>
+                            </ul>
+                            <p>How may I assist you today?</p>
+                        </div>
                     </div>
                 </li>
             </ul>
@@ -338,7 +350,7 @@ const generateResponse = (chatElement) => {
         },
         body: JSON.stringify({
             question: userMessage,
-            k: 3,
+            k: 5,
         }),
     };
 
