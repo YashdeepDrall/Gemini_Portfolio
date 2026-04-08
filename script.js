@@ -61,7 +61,7 @@ if (!document.querySelector(".chatbot-toggler")) {
                 <li class="chat incoming">
                     <span>&#129302;</span>
                     <div class="message-content">
-                        <div class="chat-message">Hi there &#128075;<br>How can I help you with cybersecurity today?</div>
+                        <div class="chat-message">👋 Welcome to IIRIS. I’m your virtual assistant, here to help with information on our services, leadership, locations, press releases, media presence, contact information, and more. How may I assist you today?</div>
                     </div>
                 </li>
             </ul>
