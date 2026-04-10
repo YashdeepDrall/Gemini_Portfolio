@@ -603,9 +603,17 @@ body.show-chatbot .chatbot-mascot {
 }
 body.show-chatbot .chatbot-toggler {
     animation: none;
+    transform: translateY(0) rotateX(0) rotateY(0) scale(1);
+}
+body.show-chatbot .chatbot-toggler:hover {
+    transform: translateY(0) rotateX(0) rotateY(0) scale(1);
 }
 body.show-chatbot .chatbot-toggler .bot-3d-stage {
     animation: none;
+}
+body.show-chatbot .chatbot-toggler::before {
+    animation: halo-spin 3.8s linear infinite;
+    opacity: 0.75;
 }
 body.show-chatbot .chatbot-toggler::after {
     display: none;

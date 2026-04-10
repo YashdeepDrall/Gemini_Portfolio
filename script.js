@@ -285,6 +285,7 @@ const initChatbot3D = () => {
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         const bot = createBotModel();
         const clock = new THREE.Clock();
+        let restBlend = 0;
 
         camera.position.set(0, 0.08, isMascot ? 4.05 : 4.35);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -312,24 +313,27 @@ const initChatbot3D = () => {
 
         const animate = () => {
             const time = clock.getElapsedTime();
+            const shouldRest = !isMascot && document.body.classList.contains("show-chatbot");
+            restBlend += ((shouldRest ? 1 : 0) - restBlend) * 0.08;
+            const motionScale = isMascot ? 1 : 1 - restBlend;
             const trickBoost = isMascot ? 1.35 : 0.9;
             const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
 
-            bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05);
-            bot.rotation.x = Math.sin(time * 1.4) * 0.08;
-            bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24);
-            bot.rotation.z = Math.sin(time * 1.8) * 0.08;
+            bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05) * motionScale;
+            bot.rotation.x = Math.sin(time * 1.4) * 0.08 * motionScale;
+            bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24) * motionScale;
+            bot.rotation.z = Math.sin(time * 1.8) * 0.08 * motionScale;
 
-            leftArm.rotation.z = -0.78 + Math.sin(time * 2.6) * 0.18 * trickBoost;
-            rightArm.rotation.z = 0.95 + Math.sin(time * 3.4) * 0.32 * trickBoost;
-            rightHand.position.y = 0.22 + Math.sin(time * 3.4) * 0.08 * trickBoost;
-            micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12);
-            helperOrb.rotation.x = time * 1.6;
-            helperOrb.rotation.y = time * 2.2;
-            helperOrb.position.y = 0.72 + Math.sin(time * 2.8) * 0.08;
-            bubbleGroup.position.y = Math.sin(time * 2.2) * 0.04;
-            bubbleGroup.scale.setScalar(1 + Math.sin(time * 3.1) * 0.025);
-            platform.rotation.z = time * 1.35;
+            leftArm.rotation.z = -0.78 + Math.sin(time * 2.6) * 0.18 * trickBoost * motionScale;
+            rightArm.rotation.z = 0.95 + Math.sin(time * 3.4) * 0.32 * trickBoost * motionScale;
+            rightHand.position.y = 0.22 + Math.sin(time * 3.4) * 0.08 * trickBoost * motionScale;
+            micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12 * motionScale);
+            helperOrb.rotation.x += 0.026 * motionScale;
+            helperOrb.rotation.y += 0.036 * motionScale;
+            helperOrb.position.y = 0.72 + Math.sin(time * 2.8) * 0.08 * motionScale;
+            bubbleGroup.position.y = Math.sin(time * 2.2) * 0.04 * motionScale;
+            bubbleGroup.scale.setScalar(1 + Math.sin(time * 3.1) * 0.025 * motionScale);
+            platform.rotation.z += 0.022 * motionScale;
 
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
