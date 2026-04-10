@@ -47,10 +47,17 @@ if (!document.querySelector(".chatbot-toggler")) {
     document.body.insertAdjacentHTML(
         "beforeend",
         `
-        <button class="chatbot-toggler">
-            <img src="OG_bot.png" alt="Open chatbot">
+        <button class="chatbot-toggler" type="button" aria-label="Open chatbot">
+            <span class="bot-3d-stage bot-3d-icon" data-bot-3d="icon">
+                <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
+            </span>
         </button>
         <div class="chatbot-container">
+            <div class="chatbot-mascot" aria-hidden="true">
+                <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
+                    <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
+                </div>
+            </div>
             <header class="chatbot-header">
                 <h2>Chatbot</h2>
                 <span class="chat-close-btn">
@@ -59,7 +66,7 @@ if (!document.querySelector(".chatbot-toggler")) {
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
-                    <img class="chatbot-avatar" src="OG_bot.png" alt="IIRIS assistant">
+                    <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                     <div class="message-content">
                         <div class="chat-message">
                             <p>👋 Welcome to IIRIS.</p>
@@ -96,6 +103,245 @@ const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
 const API_BASE_URL = "http://127.0.0.1:10000";
+
+const createBotModel = () => {
+    const { THREE } = window;
+    const mascot = new THREE.Group();
+
+    const shellMaterial = new THREE.MeshStandardMaterial({
+        color: 0x8d8cff,
+        metalness: 0.28,
+        roughness: 0.22,
+        emissive: 0x17174a,
+        emissiveIntensity: 0.12,
+    });
+    const faceMaterial = new THREE.MeshStandardMaterial({
+        color: 0xf8fbff,
+        metalness: 0.08,
+        roughness: 0.2,
+    });
+    const accentMaterial = new THREE.MeshStandardMaterial({
+        color: 0x5f63ff,
+        metalness: 0.35,
+        roughness: 0.18,
+        emissive: 0x151b66,
+        emissiveIntensity: 0.22,
+    });
+    const helperMaterial = new THREE.MeshStandardMaterial({
+        color: 0x67e8f9,
+        metalness: 0.12,
+        roughness: 0.16,
+        emissive: 0x0b7285,
+        emissiveIntensity: 0.35,
+    });
+    const eyeMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111827,
+        metalness: 0.05,
+        roughness: 0.16,
+        emissive: 0x0b102c,
+        emissiveIntensity: 0.35,
+    });
+    const glowMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.05,
+        roughness: 0.16,
+        emissive: 0x6d6dee,
+        emissiveIntensity: 0.55,
+    });
+    const bubbleMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.05,
+        roughness: 0.2,
+        transparent: true,
+        opacity: 0.9,
+        emissive: 0x343a90,
+        emissiveIntensity: 0.08,
+    });
+
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.62, 40, 28), shellMaterial);
+    body.scale.set(0.9, 0.92, 0.72);
+    body.position.y = -0.34;
+    mascot.add(body);
+
+    const helperBadge = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 16), helperMaterial);
+    helperBadge.scale.set(1.15, 0.68, 0.24);
+    helperBadge.position.set(0, -0.26, 0.56);
+    mascot.add(helperBadge);
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.7, 44, 30), shellMaterial);
+    head.scale.set(1.02, 0.92, 0.76);
+    head.position.y = 0.36;
+    mascot.add(head);
+
+    const face = new THREE.Mesh(new THREE.SphereGeometry(0.51, 40, 20), faceMaterial);
+    face.scale.set(1.18, 0.64, 0.18);
+    face.position.set(0, 0.36, 0.56);
+    mascot.add(face);
+
+    const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.07, 20, 14), eyeMaterial);
+    leftEye.position.set(-0.2, 0.44, 0.66);
+    mascot.add(leftEye);
+
+    const rightEye = leftEye.clone();
+    rightEye.position.x = 0.2;
+    mascot.add(rightEye);
+
+    const smile = new THREE.Mesh(
+        new THREE.TorusGeometry(0.17, 0.012, 10, 40, Math.PI),
+        helperMaterial
+    );
+    smile.position.set(0, 0.25, 0.68);
+    smile.rotation.set(0, 0, Math.PI);
+    mascot.add(smile);
+
+    const headsetBand = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.025, 12, 72, Math.PI * 1.15), accentMaterial);
+    headsetBand.position.set(0, 0.4, 0.04);
+    headsetBand.rotation.set(0.08, 0, Math.PI * 0.93);
+    mascot.add(headsetBand);
+
+    const leftEarCup = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 16), accentMaterial);
+    leftEarCup.scale.set(0.62, 1, 1);
+    leftEarCup.position.set(-0.72, 0.35, 0.05);
+    mascot.add(leftEarCup);
+
+    const rightEarCup = leftEarCup.clone();
+    rightEarCup.position.x = 0.72;
+    mascot.add(rightEarCup);
+
+    const micBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.022, 0.48, 16), accentMaterial);
+    micBoom.position.set(0.5, 0.12, 0.48);
+    micBoom.rotation.set(1.15, 0.15, -0.72);
+    mascot.add(micBoom);
+
+    const micTip = new THREE.Mesh(new THREE.SphereGeometry(0.055, 18, 12), helperMaterial);
+    micTip.position.set(0.3, 0.03, 0.66);
+    mascot.add(micTip);
+
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.46, 18), accentMaterial);
+    leftArm.position.set(-0.6, -0.16, 0.08);
+    leftArm.rotation.z = -0.78;
+    mascot.add(leftArm);
+
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.52, 18), accentMaterial);
+    rightArm.position.set(0.61, 0.02, 0.08);
+    rightArm.rotation.z = 0.95;
+    mascot.add(rightArm);
+
+    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14), helperMaterial);
+    leftHand.position.set(-0.78, -0.34, 0.12);
+    mascot.add(leftHand);
+
+    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.095, 20, 14), helperMaterial);
+    rightHand.position.set(0.82, 0.22, 0.12);
+    mascot.add(rightHand);
+
+    const bubbleGroup = new THREE.Group();
+    const bubblePanel = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 0.045), bubbleMaterial);
+    bubblePanel.position.set(0.96, 0.68, 0.2);
+    bubbleGroup.add(bubblePanel);
+
+    const bubbleTail = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 3), bubbleMaterial);
+    bubbleTail.position.set(0.72, 0.54, 0.2);
+    bubbleTail.rotation.set(0, 0, -0.92);
+    bubbleGroup.add(bubbleTail);
+
+    const dotOne = new THREE.Mesh(new THREE.SphereGeometry(0.025, 12, 8), accentMaterial);
+    dotOne.position.set(0.84, 0.68, 0.24);
+    bubbleGroup.add(dotOne);
+
+    const dotTwo = dotOne.clone();
+    dotTwo.position.x = 0.96;
+    bubbleGroup.add(dotTwo);
+
+    const dotThree = dotOne.clone();
+    dotThree.position.x = 1.08;
+    bubbleGroup.add(dotThree);
+    mascot.add(bubbleGroup);
+
+    const helperOrb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.08, 1), helperMaterial);
+    helperOrb.position.set(-0.72, 0.72, 0.22);
+    mascot.add(helperOrb);
+
+    const platform = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.03, 12, 72), glowMaterial);
+    platform.position.y = -0.86;
+    platform.rotation.x = Math.PI / 2;
+    mascot.add(platform);
+
+    mascot.userData = { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup };
+    return mascot;
+};
+
+const initChatbot3D = () => {
+    if (!window.THREE) return;
+
+    document.querySelectorAll("[data-bot-3d]").forEach((stage) => {
+        if (stage.dataset.threeReady === "true") return;
+        stage.dataset.threeReady = "true";
+
+        const { THREE } = window;
+        const isMascot = stage.dataset.bot3d === "mascot";
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        const bot = createBotModel();
+        const clock = new THREE.Clock();
+
+        camera.position.set(0, 0.08, isMascot ? 4.05 : 4.35);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.domElement.setAttribute("aria-hidden", "true");
+        stage.appendChild(renderer.domElement);
+        stage.classList.add("is-3d-ready");
+
+        bot.scale.setScalar(isMascot ? 1.18 : 1.02);
+        scene.add(bot);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        const rimLight = new THREE.DirectionalLight(0x9d9dff, 1.1);
+        keyLight.position.set(2.4, 2.8, 4);
+        rimLight.position.set(-2, 1.6, -2.6);
+        scene.add(ambientLight, keyLight, rimLight);
+
+        const resizeRenderer = () => {
+            const width = Math.max(1, stage.clientWidth);
+            const height = Math.max(1, stage.clientHeight);
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        };
+
+        const animate = () => {
+            const time = clock.getElapsedTime();
+            const trickBoost = isMascot ? 1.35 : 0.9;
+            const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
+
+            bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05);
+            bot.rotation.x = Math.sin(time * 1.4) * 0.08;
+            bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24);
+            bot.rotation.z = Math.sin(time * 1.8) * 0.08;
+
+            leftArm.rotation.z = -0.78 + Math.sin(time * 2.6) * 0.18 * trickBoost;
+            rightArm.rotation.z = 0.95 + Math.sin(time * 3.4) * 0.32 * trickBoost;
+            rightHand.position.y = 0.22 + Math.sin(time * 3.4) * 0.08 * trickBoost;
+            micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12);
+            helperOrb.rotation.x = time * 1.6;
+            helperOrb.rotation.y = time * 2.2;
+            helperOrb.position.y = 0.72 + Math.sin(time * 2.8) * 0.08;
+            bubbleGroup.position.y = Math.sin(time * 2.2) * 0.04;
+            bubbleGroup.scale.setScalar(1 + Math.sin(time * 3.1) * 0.025);
+            platform.rotation.z = time * 1.35;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        };
+
+        resizeRenderer();
+        animate();
+        window.addEventListener("resize", resizeRenderer);
+    });
+};
+
+initChatbot3D();
 
 const renderChatMessage = (element, message, className) => {
     if (!element) return;
@@ -183,21 +429,24 @@ if (chatCloseBtn && chatbox) {
     clearChatBtn.classList.add("clear-chat-btn");
     chatCloseBtn.parentNode.insertBefore(clearChatBtn, chatCloseBtn);
 
-    const fullscreenBtn = document.createElement("span");
-    fullscreenBtn.classList.add("fullscreen-btn");
-    fullscreenBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`;
-    fullscreenBtn.setAttribute("data-tooltip", "Fullscreen");
-    chatCloseBtn.parentNode.insertBefore(fullscreenBtn, chatCloseBtn);
+    const expandBtn = document.createElement("span");
+    const expandIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5"/><path d="M3 3l7 7"/><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/><path d="M16 21h5v-5"/><path d="M21 21l-7-7"/></svg>`;
+    const collapseIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M10 14l-7 7"/><path d="M20 14h-6v6"/><path d="M14 14l7 7"/><path d="M4 10h6V4"/><path d="M10 10L3 3"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/></svg>`;
+    expandBtn.classList.add("expand-btn");
+    expandBtn.innerHTML = expandIcon;
+    expandBtn.setAttribute("data-tooltip", "Expand");
+    chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
-    fullscreenBtn.addEventListener("click", () => {
-        chatbotContainer.classList.toggle("fullscreen");
-        if (chatbotContainer.classList.contains("fullscreen")) {
-            fullscreenBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>`;
-            fullscreenBtn.setAttribute("data-tooltip", "Exit Fullscreen");
+    expandBtn.addEventListener("click", () => {
+        chatbotContainer.classList.toggle("expanded");
+        if (chatbotContainer.classList.contains("expanded")) {
+            expandBtn.innerHTML = collapseIcon;
+            expandBtn.setAttribute("data-tooltip", "Collapse");
         } else {
-            fullscreenBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`;
-            fullscreenBtn.setAttribute("data-tooltip", "Fullscreen");
+            expandBtn.innerHTML = expandIcon;
+            expandBtn.setAttribute("data-tooltip", "Expand");
         }
+        chatbox.scrollTo(0, chatbox.scrollHeight);
     });
 
     const chatbotHeader = document.querySelector(".chatbot-header");
@@ -271,7 +520,7 @@ const createChatLi = (message, className) => {
     const chatContent =
         className === "outgoing"
             ? `<div class="chat-message"></div>`
-            : `<img class="chatbot-avatar" src="OG_bot.png" alt="IIRIS assistant"><div class="message-content"><div class="chat-message"></div><div class="chat-feedback"><button class="feedback-btn like" data-tooltip="Good response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button><button class="feedback-btn dislike" data-tooltip="Bad response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button><button class="feedback-btn copy" data-tooltip="Copy response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><span class="feedback-text"></span></div></div>`;
+            : `<img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant"><div class="message-content"><div class="chat-message"></div><div class="chat-feedback"><button class="feedback-btn like" data-tooltip="Good response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></button><button class="feedback-btn dislike" data-tooltip="Bad response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg></button><button class="feedback-btn copy" data-tooltip="Copy response"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><span class="feedback-text"></span></div></div>`;
 
     chatLi.innerHTML = chatContent;
     renderChatMessage(chatLi.querySelector(".chat-message"), message, className);

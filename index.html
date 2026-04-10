@@ -158,17 +158,24 @@
     </footer>
 
     <!-- Chatbot HTML -->
-    <button class="chatbot-toggler">
-        <img src="OG_bot.png" alt="Open chatbot">
+    <button class="chatbot-toggler" type="button" aria-label="Open chatbot">
+        <span class="bot-3d-stage bot-3d-icon" data-bot-3d="icon">
+            <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
+        </span>
     </button>
     <div class="chatbot-container">
+        <div class="chatbot-mascot" aria-hidden="true">
+            <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
+                <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
+            </div>
+        </div>
         <header class="chatbot-header">
             <h2>AI Assistant</h2>
             <span class="chat-close-btn">&times;</span>
         </header>
         <ul class="chatbox">
             <li class="chat incoming">
-                <img class="chatbot-avatar" src="OG_bot.png" alt="IIRIS assistant">
+                <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                 <div class="message-content">
                     <div class="chat-message">
                         <p>👋 Welcome to IIRIS.</p>
@@ -193,6 +200,7 @@
     </div>
 
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
     <!-- Setup and start animation! -->
