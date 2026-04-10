@@ -952,19 +952,40 @@ body.show-chatbot .chatbot-toggler::after {
     .chatbot-container {
         right: 12px;
         bottom: 88px;
-        width: min(360px, calc(100vw - 34px));
-        height: min(72vh, 540px);
-        max-height: calc(100vh - 120px);
-        max-height: calc(100dvh - 120px);
+        width: min(340px, calc(100vw - 34px));
+        height: min(64vh, 480px);
+        max-height: calc(100vh - 170px);
+        max-height: calc(100dvh - 170px);
         border-radius: 16px;
         overflow: visible;
     }
     .chatbot-container.expanded {
-        width: min(390px, calc(100vw - 24px));
+        width: min(370px, calc(100vw - 24px));
         max-width: calc(100vw - 24px);
     }
     .chatbot-mascot {
-        display: none;
+        top: -68px;
+        width: 88px;
+        height: 88px;
+        display: flex;
+    }
+    .chatbot-mascot::before {
+        inset: 9px;
+    }
+    .chatbot-mascot::after {
+        bottom: 5px;
+        width: 54px;
+        height: 11px;
+        filter: blur(4px);
+    }
+    .chatbot-mascot .bot-3d-stage {
+        width: 88px;
+        height: 88px;
+    }
+    .chatbot-mascot .bot-3d-fallback {
+        width: 72px;
+        height: 72px;
+        border-width: 2px;
     }
     .chatbot-container .chatbox {
         height: auto;
@@ -989,9 +1010,22 @@ body.show-chatbot .chatbot-toggler::after {
     .chatbot-container {
         right: 10px;
         width: calc(100vw - 22px);
-        height: min(74vh, 500px);
-        max-height: calc(100vh - 108px);
-        max-height: calc(100dvh - 108px);
+        height: min(62vh, 450px);
+        max-height: calc(100vh - 160px);
+        max-height: calc(100dvh - 160px);
+    }
+    .chatbot-mascot {
+        top: -62px;
+        width: 80px;
+        height: 80px;
+    }
+    .chatbot-mascot .bot-3d-stage {
+        width: 80px;
+        height: 80px;
+    }
+    .chatbot-mascot .bot-3d-fallback {
+        width: 66px;
+        height: 66px;
     }
 }
 
