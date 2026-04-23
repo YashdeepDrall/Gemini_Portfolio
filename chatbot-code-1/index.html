@@ -1,0 +1,48 @@
+<!-- Chatbot HTML -->
+<button class="chatbot-toggler" type="button" aria-label="Open chatbot">
+    <span class="bot-3d-stage bot-3d-icon" data-bot-3d="icon">
+        <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
+    </span>
+</button>
+<div class="chatbot-container">
+    <div class="chatbot-mascot" aria-hidden="true">
+        <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
+            <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
+        </div>
+    </div>
+    <header class="chatbot-header">
+        <h2>AI Assistant</h2>
+        <span class="chat-close-btn">&times;</span>
+    </header>
+    <ul class="chatbox">
+        <li class="chat incoming">
+            <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
+            <div class="message-content">
+                <div class="chat-message">
+                    <p>&#128075; Welcome to IIRIS.</p>
+                    <p>Here to help with information on our:</p>
+                    <ul>
+                        <li>Services</li>
+                        <li>Leadership</li>
+                        <li>Locations</li>
+                        <li>Press releases</li>
+                        <li>Media presence</li>
+                        <li>Contact information and more.</li>
+                    </ul>
+                    <p>How may I assist you today?</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="chat-input">
+        <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
+        <span id="send-btn">&#10148;</span>
+    </div>
+</div>
+
+<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
+<!-- Setup and start animation! -->
+<script src="script.js"></script>

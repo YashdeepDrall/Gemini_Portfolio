@@ -1,48 +1,3 @@
-if (document.getElementById("element") && typeof Typed !== "undefined") {
-    var typed = new Typed("#element", {
-        strings: ["Web Developer", "Graphic Designer", "Web Designer", "Video Editor"],
-        typeSpeed: 50,
-    });
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    const currentPage = window.location.pathname.split("/").pop();
-    const navLinks = document.querySelectorAll("nav .nav-link");
-    const sidebarLinks = document.querySelectorAll(".sidebar-link");
-
-    navLinks.forEach((link) => {
-        if (
-            link.getAttribute("href") === currentPage ||
-            (currentPage === "" && link.getAttribute("href") === "index.html")
-        ) {
-            link.classList.add("active");
-        }
-    });
-
-    sidebarLinks.forEach((link) => {
-        if (
-            link.getAttribute("href") === currentPage ||
-            (currentPage === "" && link.getAttribute("href") === "index.html")
-        ) {
-            link.classList.add("active");
-        }
-    });
-
-    const hamburgerMenu = document.getElementById("hamburgerMenu");
-    if (hamburgerMenu) {
-        hamburgerMenu.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.add("active");
-        });
-    }
-
-    const closeSidebar = document.getElementById("closeSidebar");
-    if (closeSidebar) {
-        closeSidebar.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.remove("active");
-        });
-    }
-});
-
 if (!document.querySelector(".chatbot-toggler")) {
     document.body.insertAdjacentHTML(
         "beforeend",
@@ -59,7 +14,7 @@ if (!document.querySelector(".chatbot-toggler")) {
                 </div>
             </div>
             <header class="chatbot-header">
-                <h2>Chatbot</h2>
+                <h2>AI Assistant</h2>
                 <span class="chat-close-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </span>
@@ -69,15 +24,15 @@ if (!document.querySelector(".chatbot-toggler")) {
                     <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                     <div class="message-content">
                         <div class="chat-message">
-                            <p>👋 Welcome to IIRIS.</p>
+                            <p>&#128075; Welcome to IIRIS.</p>
                             <p>Here to help with information on our:</p>
                             <ul>
-                                <li>services</li>
-                                <li>leadership</li>
-                                <li>locations</li>
-                                <li>press releases</li>
-                                <li>media presence</li>
-                                <li>contact information and more.</li>
+                                <li>Services</li>
+                                <li>Leadership</li>
+                                <li>Locations</li>
+                                <li>Press releases</li>
+                                <li>Media presence</li>
+                                <li>Contact information and more.</li>
                             </ul>
                             <p>How may I assist you today?</p>
                         </div>
@@ -86,9 +41,7 @@ if (!document.querySelector(".chatbot-toggler")) {
             </ul>
             <div class="chat-input">
                 <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
-                <span id="send-btn" class="material-symbols-rounded">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </span>
+                <span id="send-btn">&#10148;</span>
             </div>
         </div>
     `
@@ -107,15 +60,12 @@ const CHAT_USER_ID_KEY = "iiris_chatbot_user_id";
 
 const getChatbotUserId = () => {
     let userId = localStorage.getItem(CHAT_USER_ID_KEY);
-
     if (!userId) {
         userId = window.crypto && crypto.randomUUID
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random()}`;
-
         localStorage.setItem(CHAT_USER_ID_KEY, userId);
     }
-
     return userId;
 };
 
@@ -211,7 +161,10 @@ const createBotModel = () => {
     smile.rotation.set(0, 0, Math.PI);
     mascot.add(smile);
 
-    const headsetBand = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.025, 12, 72, Math.PI * 1.15), accentMaterial);
+    const headsetBand = new THREE.Mesh(
+        new THREE.TorusGeometry(0.68, 0.025, 12, 72, Math.PI * 1.15),
+        accentMaterial
+    );
     headsetBand.position.set(0, 0.4, 0.04);
     headsetBand.rotation.set(0.08, 0, Math.PI * 0.93);
     mascot.add(headsetBand);
@@ -225,7 +178,10 @@ const createBotModel = () => {
     rightEarCup.position.x = 0.72;
     mascot.add(rightEarCup);
 
-    const micBoom = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.022, 0.48, 16), accentMaterial);
+    const micBoom = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.017, 0.022, 0.48, 16),
+        accentMaterial
+    );
     micBoom.position.set(0.5, 0.12, 0.48);
     micBoom.rotation.set(1.15, 0.15, -0.72);
     mascot.add(micBoom);
@@ -234,12 +190,18 @@ const createBotModel = () => {
     micTip.position.set(0.3, 0.03, 0.66);
     mascot.add(micTip);
 
-    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.46, 18), accentMaterial);
+    const leftArm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.055, 0.07, 0.46, 18),
+        accentMaterial
+    );
     leftArm.position.set(-0.6, -0.16, 0.08);
     leftArm.rotation.z = -0.78;
     mascot.add(leftArm);
 
-    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.52, 18), accentMaterial);
+    const rightArm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.055, 0.07, 0.52, 18),
+        accentMaterial
+    );
     rightArm.position.set(0.61, 0.02, 0.08);
     rightArm.rotation.z = 0.95;
     mascot.add(rightArm);
@@ -253,7 +215,10 @@ const createBotModel = () => {
     mascot.add(rightHand);
 
     const bubbleGroup = new THREE.Group();
-    const bubblePanel = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 0.045), bubbleMaterial);
+    const bubblePanel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.28, 0.045),
+        bubbleMaterial
+    );
     bubblePanel.position.set(0.96, 0.68, 0.2);
     bubbleGroup.add(bubblePanel);
 
@@ -275,7 +240,10 @@ const createBotModel = () => {
     bubbleGroup.add(dotThree);
     mascot.add(bubbleGroup);
 
-    const helperOrb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.08, 1), helperMaterial);
+    const helperOrb = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.08, 1),
+        helperMaterial
+    );
     helperOrb.position.set(-0.72, 0.72, 0.22);
     mascot.add(helperOrb);
 
@@ -284,7 +252,16 @@ const createBotModel = () => {
     platform.rotation.x = Math.PI / 2;
     mascot.add(platform);
 
-    mascot.userData = { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup };
+    mascot.userData = {
+        leftArm,
+        rightArm,
+        rightHand,
+        micTip,
+        helperOrb,
+        platform,
+        bubbleGroup,
+    };
+
     return mascot;
 };
 
@@ -334,7 +311,8 @@ const initChatbot3D = () => {
             restBlend += ((shouldRest ? 1 : 0) - restBlend) * 0.08;
             const motionScale = isMascot ? 1 : 1 - restBlend;
             const trickBoost = isMascot ? 1.35 : 0.9;
-            const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
+            const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } =
+                bot.userData;
 
             bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05) * motionScale;
             bot.rotation.x = Math.sin(time * 1.4) * 0.08 * motionScale;
@@ -645,7 +623,7 @@ const generateResponse = (chatElement) => {
             question: userMessage,
             user_id: chatbotUserId,
             history: getBackendHistory(),
-            k: 7,
+            k: 15,
             temperature: 0.7,
         }),
     };
@@ -670,13 +648,13 @@ const generateResponse = (chatElement) => {
             if (error.message === "Failed to fetch") {
                 renderChatMessage(
                     messageElement,
-                    "Error: Cannot connect to server. Ensure Python backend is running & CORS is enabled.",
+                    "Error: Cannot connect to server. Ensure the backend is running and CORS is enabled.",
                     "incoming"
                 );
             } else {
                 renderChatMessage(
                     messageElement,
-                    "Oops! Something went wrong. Check console (F12) for error.",
+                    "Oops! Something went wrong. Please check the browser console for details.",
                     "incoming"
                 );
             }
@@ -726,14 +704,20 @@ if (chatInput) {
     });
 }
 
-if (sendChatBtn) sendChatBtn.addEventListener("click", handleChat);
+if (sendChatBtn) {
+    sendChatBtn.addEventListener("click", handleChat);
+}
 
 if (chatbotToggler) {
-    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+    chatbotToggler.addEventListener("click", () => {
+        document.body.classList.toggle("show-chatbot");
+    });
 }
 
 if (chatCloseBtn) {
-    chatCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+    chatCloseBtn.addEventListener("click", () => {
+        document.body.classList.remove("show-chatbot");
+    });
 }
 
 if (chatbox) {
