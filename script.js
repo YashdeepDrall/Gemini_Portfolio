@@ -115,6 +115,8 @@ const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
 const API_BASE_URL = "https://iiris-bot.vercel.app";
+let clampChatbotToViewport = () => {};
+let scheduleChatbotViewportClamp = () => {};
 
 const setChatbotState = (isOpen) => {
     document.body.classList.toggle("show-chatbot", isOpen);
@@ -123,6 +125,9 @@ const setChatbotState = (isOpen) => {
     }
     if (chatbotToggler) {
         chatbotToggler.setAttribute("aria-label", isOpen ? "Close chatbot" : "Open chatbot");
+    }
+    if (isOpen) {
+        scheduleChatbotViewportClamp();
     }
 };
 
@@ -239,24 +244,24 @@ const createBotModel = () => {
     micTip.position.set(0.3, 0.03, 0.66);
     mascot.add(micTip);
 
-    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.5, 18), accentMaterial);
-    leftArm.position.set(-0.64, -0.12, 0.46);
-    leftArm.rotation.set(0.2, 0.18, -0.72);
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.42, 18), accentMaterial);
+    leftArm.position.set(-0.6, -0.06, 0.5);
+    leftArm.rotation.set(0.18, 0.08, -0.9);
     mascot.add(leftArm);
 
-    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.52, 18), accentMaterial);
-    rightArm.position.set(0.64, 0.06, 0.48);
-    rightArm.rotation.set(-0.1, -0.16, 0.84);
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.42, 18), accentMaterial);
+    rightArm.position.set(0.6, -0.06, 0.5);
+    rightArm.rotation.set(0.18, -0.08, 0.9);
     mascot.add(rightArm);
 
-    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 16), helperMaterial);
-    leftHand.scale.set(1.08, 0.94, 1.08);
-    leftHand.position.set(-0.86, -0.29, 0.58);
+    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), helperMaterial);
+    leftHand.scale.set(1.08, 0.92, 1.08);
+    leftHand.position.set(-0.78, -0.22, 0.62);
     mascot.add(leftHand);
 
-    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 16), helperMaterial);
-    rightHand.scale.set(1.08, 0.94, 1.08);
-    rightHand.position.set(0.86, 0.24, 0.58);
+    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), helperMaterial);
+    rightHand.scale.set(1.08, 0.92, 1.08);
+    rightHand.position.set(0.78, -0.22, 0.62);
     mascot.add(rightHand);
 
     const bubbleGroup = new THREE.Group();
@@ -348,12 +353,12 @@ const initChatbot3D = () => {
             bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24) * motionScale;
             bot.rotation.z = Math.sin(time * 1.8) * 0.08 * motionScale;
 
-            leftArm.rotation.z = -0.72 + Math.sin(time * 2.6) * 0.12 * trickBoost * motionScale;
-            rightArm.rotation.z = 0.84 + Math.sin(time * 3.4) * 0.2 * trickBoost * motionScale;
-            leftHand.position.y = -0.29 + Math.sin(time * 2.6) * 0.035 * trickBoost * motionScale;
-            leftHand.position.z = 0.58 + Math.cos(time * 2.2) * 0.018 * trickBoost * motionScale;
-            rightHand.position.y = 0.24 + Math.sin(time * 3.4) * 0.06 * trickBoost * motionScale;
-            rightHand.position.z = 0.58 + Math.cos(time * 2.7) * 0.018 * trickBoost * motionScale;
+            leftArm.rotation.z = -0.9 + Math.sin(time * 2.4) * 0.08 * trickBoost * motionScale;
+            rightArm.rotation.z = 0.9 + Math.sin(time * 2.7) * 0.08 * trickBoost * motionScale;
+            leftHand.position.y = -0.22 + Math.sin(time * 2.4) * 0.025 * trickBoost * motionScale;
+            leftHand.position.x = -0.78 + Math.cos(time * 2.1) * 0.012 * trickBoost * motionScale;
+            rightHand.position.y = -0.22 + Math.sin(time * 2.7) * 0.025 * trickBoost * motionScale;
+            rightHand.position.x = 0.78 + Math.cos(time * 2.3) * 0.012 * trickBoost * motionScale;
             micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12 * motionScale);
             helperOrb.rotation.x += 0.026 * motionScale;
             helperOrb.rotation.y += 0.036 * motionScale;
@@ -468,6 +473,35 @@ const loadChatHistory = () => {
 
 if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
+    const CHATBOT_VIEWPORT_MARGIN = 12;
+
+    clampChatbotToViewport = () => {
+        if (!chatbotContainer || !document.body.classList.contains("show-chatbot")) return;
+
+        const rect = chatbotContainer.getBoundingClientRect();
+        const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom || 0;
+        const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+        const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+        const mascotOffset = 68;
+        const minLeft = CHATBOT_VIEWPORT_MARGIN;
+        const minTop = headerBottom + mascotOffset;
+        const maxLeft = Math.max(minLeft, viewportWidth - rect.width - CHATBOT_VIEWPORT_MARGIN);
+        const maxTop = Math.max(minTop, viewportHeight - rect.height - CHATBOT_VIEWPORT_MARGIN);
+        const nextLeft = Math.min(Math.max(rect.left, minLeft), maxLeft);
+        const nextTop = Math.min(Math.max(rect.top, minTop), maxTop);
+
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${nextLeft}px`;
+        chatbotContainer.style.top = `${nextTop}px`;
+    };
+
+    scheduleChatbotViewportClamp = () => {
+        clampChatbotToViewport();
+        requestAnimationFrame(clampChatbotToViewport);
+        window.setTimeout(clampChatbotToViewport, 80);
+        window.setTimeout(clampChatbotToViewport, 260);
+    };
 
     const clearChatBtn = document.createElement("button");
     clearChatBtn.type = "button";
@@ -499,6 +533,7 @@ if (chatCloseBtn && chatbox) {
             expandBtn.setAttribute("aria-pressed", "false");
             expandBtn.setAttribute("data-tooltip", "Expand");
         }
+        scheduleChatbotViewportClamp();
         chatbox.scrollTo(0, chatbox.scrollHeight);
     });
 
@@ -518,6 +553,7 @@ if (chatCloseBtn && chatbox) {
     const stopDrag = () => {
         isDragging = false;
         chatbotContainer.style.transition = "";
+        scheduleChatbotViewportClamp();
         document.removeEventListener("mousemove", onDrag);
         document.removeEventListener("mouseup", stopDrag);
     };
@@ -543,6 +579,8 @@ if (chatCloseBtn && chatbox) {
             document.addEventListener("mouseup", stopDrag);
         });
     }
+
+    window.addEventListener("resize", scheduleChatbotViewportClamp);
 
     const initialChatContent = chatbox.innerHTML;
     clearChatBtn.addEventListener("click", () => {
