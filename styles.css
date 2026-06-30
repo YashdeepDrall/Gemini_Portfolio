@@ -8,6 +8,7 @@ body {
     background-color: rgb(2, 2, 52);
     color: aliceblue;
     font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
 }
 
 /* Navbar Styles */
@@ -22,7 +23,18 @@ nav {
 }
 
 nav .left {
+    color: white;
     font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a {
+    color: rgb(162, 162, 255);
+}
+
+button {
+    font: inherit;
 }
 
 nav ul {
@@ -51,6 +63,8 @@ nav ul li a.active {
 
 /* For the hamburger menu */
 .hamburger {
+    background: transparent;
+    border: 0;
     display: none;
     font-size: 2rem;
     color: white;
@@ -104,6 +118,8 @@ nav ul li a.active {
 }
 
 .close-btn {
+    background: transparent;
+    border: 0;
     font-size: 2rem;
     color: white;
     cursor: pointer;
@@ -183,6 +199,27 @@ footer .footer-rights {
 
 .purple {
     color: blueviolet;
+}
+
+.content-section {
+    max-width: 860px;
+    min-height: calc(100vh - 220px);
+    margin: 64px auto;
+    padding: 0 20px;
+}
+
+.content-section p,
+.content-section li {
+    color: rgb(219, 226, 235);
+    font-size: 1rem;
+}
+
+.content-section ul {
+    padding-left: 1.4rem;
+}
+
+.content-section li + li {
+    margin-top: 8px;
 }
 
 /* Home Page Specific Styles */
@@ -639,6 +676,8 @@ body.show-chatbot .chatbot-toggler::after {
     white-space: nowrap;
 }
 .chat-close-btn {
+    background: transparent;
+    border: 0;
     color: #fff;
     cursor: pointer;
     font-size: 1.5rem;
@@ -656,6 +695,7 @@ body.show-chatbot .chatbot-toggler::after {
     background: rgba(255, 255, 255, 0.2);
 }
 .clear-chat-btn {
+    border: 0;
     color: #fff;
     cursor: pointer;
     font-size: 0.9rem;
@@ -672,6 +712,8 @@ body.show-chatbot .chatbot-toggler::after {
     background: rgba(255, 255, 255, 0.4);
 }
 .expand-btn {
+    background: transparent;
+    border: 0;
     color: #fff;
     cursor: pointer;
     font-size: 1.1rem;
@@ -753,8 +795,10 @@ body.show-chatbot .chatbot-toggler::after {
     background: transparent;
     color: white;
 }
-.chat-input span {
+.chat-input button {
     align-self: flex-end;
+    background: transparent;
+    border: 0;
     color: rgb(109, 109, 238);
     cursor: pointer;
     height: 45px;
@@ -894,7 +938,33 @@ body.show-chatbot .chatbot-toggler::after {
     background-color: #fff;
     border-radius: 50%;
     animation: typing-bounce 1.4s infinite ease-in-out both;
-    animation-delay: var(--delay);
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+a:focus-visible,
+button:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgb(162, 162, 255);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 @keyframes typing-bounce {

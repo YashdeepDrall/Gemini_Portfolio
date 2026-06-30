@@ -5,6 +5,18 @@ if (document.getElementById("element") && typeof Typed !== "undefined") {
     });
 }
 
+const setSidebarState = (isOpen) => {
+    const sidebar = document.getElementById("sidebar");
+    const hamburgerMenu = document.getElementById("hamburgerMenu");
+
+    if (!sidebar) return;
+
+    sidebar.classList.toggle("active", isOpen);
+    if (hamburgerMenu) {
+        hamburgerMenu.setAttribute("aria-expanded", String(isOpen));
+    }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     const currentPage = window.location.pathname.split("/").pop();
     const navLinks = document.querySelectorAll("nav .nav-link");
@@ -31,14 +43,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const hamburgerMenu = document.getElementById("hamburgerMenu");
     if (hamburgerMenu) {
         hamburgerMenu.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.add("active");
+            setSidebarState(true);
         });
     }
 
     const closeSidebar = document.getElementById("closeSidebar");
     if (closeSidebar) {
         closeSidebar.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.remove("active");
+            setSidebarState(false);
         });
     }
 });
@@ -52,24 +64,24 @@ if (!document.querySelector(".chatbot-toggler")) {
                 <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
             </span>
         </button>
-        <div class="chatbot-container">
+        <div class="chatbot-container" role="dialog" aria-label="AI Assistant" aria-hidden="true">
             <div class="chatbot-mascot" aria-hidden="true">
                 <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
                     <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
                 </div>
             </div>
             <header class="chatbot-header">
-                <h2>Chatbot</h2>
-                <span class="chat-close-btn">
+                <h2>AI Assistant</h2>
+                <button class="chat-close-btn" type="button" aria-label="Close chatbot" data-tooltip="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </span>
+                </button>
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
                     <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                     <div class="message-content">
                         <div class="chat-message">
-                            <p>👋 Welcome to IIRIS.</p>
+                            <p>Welcome to IIRIS.</p>
                             <p>Here to help with information on our:</p>
                             <ul>
                                 <li>services</li>
@@ -86,9 +98,9 @@ if (!document.querySelector(".chatbot-toggler")) {
             </ul>
             <div class="chat-input">
                 <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
-                <span id="send-btn" class="material-symbols-rounded">
+                <button id="send-btn" class="send-chat-btn" type="button" aria-label="Send message">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </span>
+                </button>
             </div>
         </div>
     `
@@ -102,24 +114,17 @@ const sendChatBtn = document.getElementById("send-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
-const API_BASE_URL = "http://127.0.0.1:10000";
-const CHAT_USER_ID_KEY = "iiris_chatbot_user_id";
+const API_BASE_URL = "https://iiris-bot.vercel.app";
 
-const getChatbotUserId = () => {
-    let userId = localStorage.getItem(CHAT_USER_ID_KEY);
-
-    if (!userId) {
-        userId = window.crypto && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random()}`;
-
-        localStorage.setItem(CHAT_USER_ID_KEY, userId);
+const setChatbotState = (isOpen) => {
+    document.body.classList.toggle("show-chatbot", isOpen);
+    if (chatbotContainer) {
+        chatbotContainer.setAttribute("aria-hidden", String(!isOpen));
     }
-
-    return userId;
+    if (chatbotToggler) {
+        chatbotToggler.setAttribute("aria-label", isOpen ? "Close chatbot" : "Open chatbot");
+    }
 };
-
-let chatbotUserId = getChatbotUserId();
 
 const createBotModel = () => {
     const { THREE } = window;
@@ -407,13 +412,23 @@ const saveChatHistory = () => {
         messages.push({ message, className, chatId });
     });
 
-    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    try {
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    } catch (error) {
+        console.error("Unable to save chat history:", error);
+    }
 };
 
 const loadChatHistory = () => {
     if (!chatbox) return;
 
-    const storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    let storedHistory;
+    try {
+        storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    } catch (error) {
+        console.error("Unable to read chat history:", error);
+        return;
+    }
     if (!storedHistory) return;
 
     let history;
@@ -421,7 +436,11 @@ const loadChatHistory = () => {
         history = JSON.parse(storedHistory);
     } catch (error) {
         console.error("Invalid chat history in localStorage:", error);
-        localStorage.removeItem(CHAT_HISTORY_KEY);
+        try {
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+        } catch (storageError) {
+            console.error("Unable to remove invalid chat history:", storageError);
+        }
         return;
     }
 
@@ -445,16 +464,19 @@ const loadChatHistory = () => {
 if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
 
-    const clearChatBtn = document.createElement("span");
+    const clearChatBtn = document.createElement("button");
+    clearChatBtn.type = "button";
     clearChatBtn.textContent = "Clear Chat";
     clearChatBtn.classList.add("clear-chat-btn");
     chatCloseBtn.parentNode.insertBefore(clearChatBtn, chatCloseBtn);
 
-    const expandBtn = document.createElement("span");
+    const expandBtn = document.createElement("button");
+    expandBtn.type = "button";
     const expandIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5"/><path d="M3 3l7 7"/><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/><path d="M16 21h5v-5"/><path d="M21 21l-7-7"/></svg>`;
     const collapseIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M10 14l-7 7"/><path d="M20 14h-6v6"/><path d="M14 14l7 7"/><path d="M4 10h6V4"/><path d="M10 10L3 3"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/></svg>`;
     expandBtn.classList.add("expand-btn");
     expandBtn.innerHTML = expandIcon;
+    expandBtn.setAttribute("aria-label", "Expand chatbot");
     expandBtn.setAttribute("data-tooltip", "Expand");
     chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
@@ -462,9 +484,11 @@ if (chatCloseBtn && chatbox) {
         chatbotContainer.classList.toggle("expanded");
         if (chatbotContainer.classList.contains("expanded")) {
             expandBtn.innerHTML = collapseIcon;
+            expandBtn.setAttribute("aria-label", "Collapse chatbot");
             expandBtn.setAttribute("data-tooltip", "Collapse");
         } else {
             expandBtn.innerHTML = expandIcon;
+            expandBtn.setAttribute("aria-label", "Expand chatbot");
             expandBtn.setAttribute("data-tooltip", "Expand");
         }
         chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -514,9 +538,11 @@ if (chatCloseBtn && chatbox) {
 
     const initialChatContent = chatbox.innerHTML;
     clearChatBtn.addEventListener("click", () => {
-        localStorage.removeItem(CHAT_HISTORY_KEY);
-        localStorage.removeItem(CHAT_USER_ID_KEY);
-        chatbotUserId = getChatbotUserId();
+        try {
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+        } catch (error) {
+            console.error("Unable to clear chat history:", error);
+        }
         chatbox.innerHTML = initialChatContent;
     });
 }
@@ -596,39 +622,34 @@ const createChatLi = (message, className) => {
                 feedbackText.textContent = "";
             } else {
                 const text = chatLi.querySelector(".chat-message").textContent;
-                navigator.clipboard.writeText(text).then(() => {
-                    copyBtn.classList.add("active");
-                    feedbackText.textContent = "Response copied";
+                if (!navigator.clipboard) {
+                    feedbackText.textContent = "Copy is unavailable";
                     setTimeout(() => {
                         feedbackText.textContent = "";
                     }, 2000);
-                });
+                    return;
+                }
+
+                navigator.clipboard
+                    .writeText(text)
+                    .then(() => {
+                        copyBtn.classList.add("active");
+                        feedbackText.textContent = "Response copied";
+                        setTimeout(() => {
+                            feedbackText.textContent = "";
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        feedbackText.textContent = "Copy failed";
+                        setTimeout(() => {
+                            feedbackText.textContent = "";
+                        }, 2000);
+                    });
             }
         });
     }
 
     return chatLi;
-};
-
-const getBackendHistory = () => {
-    const chats = Array.from(chatbox.querySelectorAll(".chat"));
-    const previousChats = chats.slice(0, -2);
-
-    return previousChats
-        .map((chat) => {
-            const messageElement = chat.querySelector(".chat-message");
-            if (!messageElement || messageElement.querySelector(".typing-animation")) return null;
-
-            const content = messageElement.dataset.rawMessage || messageElement.textContent || "";
-            if (!content.trim()) return null;
-
-            return {
-                role: chat.classList.contains("outgoing") ? "user" : "assistant",
-                content: content.trim(),
-            };
-        })
-        .filter(Boolean)
-        .slice(-12);
 };
 
 const generateResponse = (chatElement) => {
@@ -643,10 +664,7 @@ const generateResponse = (chatElement) => {
         },
         body: JSON.stringify({
             question: userMessage,
-            user_id: chatbotUserId,
-            history: getBackendHistory(),
-            k: 7,
-            temperature: 0.7,
+            k: 5,
         }),
     };
 
@@ -701,10 +719,10 @@ const handleChat = () => {
     setTimeout(() => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
         const messageElement = incomingChatLi.querySelector(".chat-message");
-        messageElement.innerHTML = `<div class="typing-animation">
-            <div class="typing-dot" style="--delay: 0.2s"></div>
-            <div class="typing-dot" style="--delay: 0.3s"></div>
-            <div class="typing-dot" style="--delay: 0.4s"></div>
+        messageElement.innerHTML = `<div class="typing-animation" aria-label="Assistant is typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
         </div>`;
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -727,22 +745,33 @@ if (chatInput) {
 }
 
 if (sendChatBtn) sendChatBtn.addEventListener("click", handleChat);
-
 if (chatbotToggler) {
-    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+    chatbotToggler.addEventListener("click", () => {
+        setChatbotState(!document.body.classList.contains("show-chatbot"));
+    });
 }
-
 if (chatCloseBtn) {
-    chatCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+    chatCloseBtn.addEventListener("click", () => setChatbotState(false));
 }
 
 if (chatbox) {
     loadChatHistory();
 }
 
-if (!sessionStorage.getItem("chatbotOpened")) {
+let hasOpenedChatbot = false;
+try {
+    hasOpenedChatbot = sessionStorage.getItem("chatbotOpened") === "true";
+} catch (error) {
+    console.error("Unable to read chatbot session state:", error);
+}
+
+if (!hasOpenedChatbot) {
     setTimeout(() => {
-        document.body.classList.add("show-chatbot");
-        sessionStorage.setItem("chatbotOpened", "true");
+        setChatbotState(true);
+        try {
+            sessionStorage.setItem("chatbotOpened", "true");
+        } catch (error) {
+            console.error("Unable to save chatbot session state:", error);
+        }
     }, 3000);
 }

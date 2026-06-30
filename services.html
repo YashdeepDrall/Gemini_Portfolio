@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore Yashdeep's web development, graphic design, video editing, and 3D design services.">
+    <meta name="theme-color" content="#020234">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://iiris-bot.vercel.app; img-src 'self' https://cdn.dribbble.com data:; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; base-uri 'self'; object-src 'none'; form-action 'self'; upgrade-insecure-requests">
     <title>Services - Yashdeep</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <header>
         <nav>
-            <div class="left">Yashdeep's Portfolio</div>
-            <ul id="navMenu" class="nav-menu">
+            <a class="left" href="index.html">Yashdeep's Portfolio</a>
+            <ul id="navMenu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="about.html" class="nav-link">About</a></li>
                 <li><a href="services.html" class="nav-link">Services</a></li>
                 <li><a href="projects.html" class="nav-link">Projects</a></li>
                 <li><a href="contact.html" class="nav-link">Contact Me</a></li>
             </ul>
-            <div id="hamburgerMenu" class="hamburger">&#9776;</div>
+            <button id="hamburgerMenu" class="hamburger" type="button" aria-label="Open navigation menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
         </nav>
-        <!-- Sidebar for mobile view -->
-        <div id="sidebar" class="sidebar">
-            <div id="closeSidebar" class="close-btn">&#10005;</div>
-            <ul>
-                <li><a href="index.html" class="sidebar-link">Home</a></li>
-                <li><a href="about.html" class="sidebar-link">About</a></li>
-                <li><a href="services.html" class="sidebar-link">Services</a></li>
-                <li><a href="projects.html" class="sidebar-link">Projects</a></li>
-                <li><a href="contact.html" class="sidebar-link">Contact Me</a></li>
-            </ul>
-        </div>
     </header>
+
+    <aside id="sidebar" class="sidebar" aria-label="Mobile navigation">
+        <button id="closeSidebar" class="close-btn" type="button" aria-label="Close navigation menu">&#10005;</button>
+        <ul>
+            <li><a href="index.html" class="sidebar-link">Home</a></li>
+            <li><a href="about.html" class="sidebar-link">About</a></li>
+            <li><a href="services.html" class="sidebar-link">Services</a></li>
+            <li><a href="projects.html" class="sidebar-link">Projects</a></li>
+            <li><a href="contact.html" class="sidebar-link">Contact Me</a></li>
+        </ul>
+    </aside>
+
     <main>
-        <section>
+        <section class="content-section">
             <h1>Services</h1>
             <p>Here are the services I offer:</p>
             <ul>
@@ -43,6 +52,7 @@
             </ul>
         </section>
     </main>
+
     <footer>
         <div class="footer">
             <div class="footer-rights">
@@ -50,44 +60,11 @@
             </div>
         </div>
     </footer>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get the current page URL (excluding query parameters)
-        const currentPage = window.location.pathname.split('/').pop();
-    
-          // Select all nav links and sidebar links
-        const navLinks = document.querySelectorAll('nav .nav-link');
-        const sidebarLinks = document.querySelectorAll('.sidebar-link');
 
-        // Loop through nav links and sidebar links to add 'active' class to the current page
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPage || 
-                (currentPage === '' && link.getAttribute('href') === 'index.html')) {
-                link.classList.add('active');
-            }
-        });
-
-        sidebarLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPage || 
-                (currentPage === '' && link.getAttribute('href') === 'index.html')) {
-                link.classList.add('active');
-            }
-        });
-
-        // Add click event to hamburger menu
-        document.getElementById('hamburgerMenu').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.add('active');
-        });
-
-        // Add click event to close button
-        document.getElementById('closeSidebar').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.remove('active');
-        });
-    });
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>

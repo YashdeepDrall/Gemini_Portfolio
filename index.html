@@ -4,18 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Yashdeep's portfolio for web development, design, video editing, 3D design, and programming work.">
+    <meta name="theme-color" content="#020234">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://iiris-bot.vercel.app; img-src 'self' https://cdn.dribbble.com data:; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; base-uri 'self'; object-src 'none'; form-action 'self'; upgrade-insecure-requests">
     <title>Yashdeep-Developer Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <header>
         <nav>
-            <div class="left">Yashdeep's Portfolio</div>
+            <a class="left" href="index.html">Yashdeep's Portfolio</a>
             <ul id="navMenu">
                 <li><a href="index.html" class="nav-link" data-page="home">Home</a></li>
                 <li><a href="about.html" class="nav-link" data-page="about">About</a></li>
@@ -23,12 +25,12 @@
                 <li><a href="projects.html" class="nav-link" data-page="projects">Projects</a></li>
                 <li><a href="contact.html" class="nav-link" data-page="contact">Contact Me</a></li>
             </ul>
-            <div class="hamburger" id="hamburgerMenu">&#9776;</div>
+            <button class="hamburger" id="hamburgerMenu" type="button" aria-label="Open navigation menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
         </nav>
     </header>
 
-    <div id="sidebar" class="sidebar">
-        <div id="closeSidebar" class="close-btn">&#10005;</div>
+    <aside id="sidebar" class="sidebar" aria-label="Mobile navigation">
+        <button id="closeSidebar" class="close-btn" type="button" aria-label="Close navigation menu">&#10005;</button>
         <ul>
             <li><a href="index.html" class="sidebar-link">Home</a></li>
             <li><a href="about.html" class="sidebar-link">About</a></li>
@@ -36,7 +38,7 @@
             <li><a href="projects.html" class="sidebar-link">Projects</a></li>
             <li><a href="contact.html" class="sidebar-link">Contact Me</a></li>
         </ul>
-    </div>
+    </aside>
 
 
     <main>
@@ -47,18 +49,18 @@
                 <span id="element"></span>
 
                 <div class="buttons">
-                    <a href="Yashdeep_resume.pdf" download="Yashdeep_resume.pdf" target="_blank" class="btn">Download
+                    <a href="Yashdeep_resume.pdf" download="Yashdeep_resume.pdf" target="_blank" rel="noopener noreferrer" class="btn">Download
                         Resume</a>
 
 
 
 
-                    <a href="https://github.com/YashdeepDrall" target="_blank" class="btn">Visit GitHub</a>
+                    <a href="https://github.com/YashdeepDrall" target="_blank" rel="noopener noreferrer" class="btn">Visit GitHub</a>
 
                 </div>
             </div>
             <div class="rightSection">
-                <img src="https://cdn.dribbble.com/users/1162077/screenshots/3848914/programmer.gif" alt="">
+                <img src="https://cdn.dribbble.com/users/1162077/screenshots/3848914/programmer.gif" alt="Animated programmer working at a computer">
             </div>
         </section>
 
@@ -71,7 +73,7 @@
             <div class="box">
 
                 <div class="vertical">
-                    <img class="image-top" src="developer.png" alt="">
+                    <img class="image-top" src="developer.png" alt="Website development icon">
 
                     <div class="vertical-title">
                         Website Development
@@ -84,7 +86,7 @@
                 </div>
 
                 <div class="vertical">
-                    <img class="image-top" src="photoshop.png" alt="">
+                    <img class="image-top" src="photoshop.png" alt="Video editing icon">
 
                     <div class="vertical-title">
                         Video Editing
@@ -97,7 +99,7 @@
                 </div>
 
                 <div class="vertical">
-                    <img class="image-top" src="blender.png" alt="">
+                    <img class="image-top" src="blender.png" alt="3D design icon">
 
                     <div class="vertical-title">
                         3D Designs
@@ -110,20 +112,20 @@
                 </div>
 
                 <div class="vertical">
-                    <img class="image-top" src="python.png" alt="">
+                    <img class="image-top" src="python.png" alt="Programming languages icon">
 
                     <div class="vertical-title">
                         Programming Languages
                     </div>
 
                     <div class="vertical-desc">
-                        Knows how to use and interact with PHP , Phtyon , NodeJS etc..
+                        Knows how to use and interact with PHP, Python, Node.js, and related tools.
 
                     </div>
                 </div>
 
                 <div class="vertical">
-                    <img class="image-top" src="DSA.png" alt="">
+                    <img class="image-top" src="DSA.png" alt="Data structures and algorithms icon">
 
                     <div class="vertical-title">
                         Currently Working....
@@ -134,10 +136,6 @@
 
                     </div>
                 </div>
-
-
-                <div class="vertical"></div>
-                <div class="vertical"></div>
 
             </div>
 
@@ -163,7 +161,7 @@
             <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
         </span>
     </button>
-    <div class="chatbot-container">
+    <div class="chatbot-container" role="dialog" aria-label="AI Assistant" aria-hidden="true">
         <div class="chatbot-mascot" aria-hidden="true">
             <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
                 <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
@@ -171,14 +169,14 @@
         </div>
         <header class="chatbot-header">
             <h2>AI Assistant</h2>
-            <span class="chat-close-btn">&times;</span>
+            <button class="chat-close-btn" type="button" aria-label="Close chatbot" data-tooltip="Close">&times;</button>
         </header>
         <ul class="chatbox">
             <li class="chat incoming">
                 <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                 <div class="message-content">
                     <div class="chat-message">
-                        <p>👋 Welcome to IIRIS.</p>
+                        <p>Welcome to IIRIS.</p>
                         <p>Here to help with information on our:</p>
                         <ul>
                             <li>Services</li>
@@ -195,7 +193,7 @@
         </ul>
         <div class="chat-input">
             <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
-            <span id="send-btn">&#10148;</span>
+            <button id="send-btn" class="send-chat-btn" type="button" aria-label="Send message">&#10148;</button>
         </div>
     </div>
 
