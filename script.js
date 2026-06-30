@@ -472,6 +472,7 @@ const loadChatHistory = () => {
 if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
     const CHATBOT_VIEWPORT_MARGIN = 12;
+    let collapsedPositionBeforeExpand = null;
 
     const lockChatbotPosition = () => {
         const rect = chatbotContainer.getBoundingClientRect();
@@ -480,6 +481,15 @@ if (chatCloseBtn && chatbox) {
         chatbotContainer.style.left = `${rect.left}px`;
         chatbotContainer.style.top = `${rect.top}px`;
         return rect;
+    };
+
+    const restoreChatbotPosition = (position) => {
+        if (!position) return;
+
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${position.left}px`;
+        chatbotContainer.style.top = `${position.top}px`;
     };
 
     clampChatbotToViewport = ({ preserveTop = false } = {}) => {
@@ -533,18 +543,27 @@ if (chatCloseBtn && chatbox) {
     chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
     expandBtn.addEventListener("click", () => {
-        lockChatbotPosition();
-        chatbotContainer.classList.toggle("expanded");
-        if (chatbotContainer.classList.contains("expanded")) {
-            expandBtn.innerHTML = collapseIcon;
-            expandBtn.setAttribute("aria-label", "Collapse chatbot");
-            expandBtn.setAttribute("aria-pressed", "true");
-            expandBtn.setAttribute("data-tooltip", "Collapse");
-        } else {
+        const wasExpanded = chatbotContainer.classList.contains("expanded");
+        const currentPosition = lockChatbotPosition();
+
+        if (wasExpanded) {
+            chatbotContainer.classList.remove("expanded");
+            restoreChatbotPosition(collapsedPositionBeforeExpand);
+            collapsedPositionBeforeExpand = null;
             expandBtn.innerHTML = expandIcon;
             expandBtn.setAttribute("aria-label", "Expand chatbot");
             expandBtn.setAttribute("aria-pressed", "false");
             expandBtn.setAttribute("data-tooltip", "Expand");
+        } else {
+            collapsedPositionBeforeExpand = {
+                left: currentPosition.left,
+                top: currentPosition.top,
+            };
+            chatbotContainer.classList.add("expanded");
+            expandBtn.innerHTML = collapseIcon;
+            expandBtn.setAttribute("aria-label", "Collapse chatbot");
+            expandBtn.setAttribute("aria-pressed", "true");
+            expandBtn.setAttribute("data-tooltip", "Collapse");
         }
         scheduleChatbotViewportClamp({ preserveTop: true });
         chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -576,6 +595,9 @@ if (chatCloseBtn && chatbox) {
             if (event.target.closest("span") || event.target.closest("button")) return;
             isDragging = true;
             chatbotContainer.style.transition = "none";
+            if (chatbotContainer.classList.contains("expanded")) {
+                collapsedPositionBeforeExpand = null;
+            }
 
             const rect = lockChatbotPosition();
 
