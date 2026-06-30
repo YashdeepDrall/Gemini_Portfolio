@@ -474,19 +474,37 @@ const loadChatHistory = () => {
 if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
     const CHATBOT_VIEWPORT_MARGIN = 12;
+    const CHATBOT_LAUNCHER_GAP = 18;
+
+    const rectanglesOverlapOnXAxis = (firstRect, secondRect, gap = 0) => (
+        firstRect.left < secondRect.right + gap && firstRect.right > secondRect.left - gap
+    );
 
     clampChatbotToViewport = () => {
         if (!chatbotContainer || !document.body.classList.contains("show-chatbot")) return;
 
-        const rect = chatbotContainer.getBoundingClientRect();
         const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom || 0;
         const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
         const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
         const mascotOffset = 68;
         const minLeft = CHATBOT_VIEWPORT_MARGIN;
         const minTop = headerBottom + mascotOffset;
+        const launcherRect = chatbotToggler?.getBoundingClientRect();
+        let rect = chatbotContainer.getBoundingClientRect();
+        let bottomLimit = viewportHeight - CHATBOT_VIEWPORT_MARGIN;
+        const overlapsLauncherColumn = launcherRect && rectanglesOverlapOnXAxis(rect, launcherRect, CHATBOT_LAUNCHER_GAP);
+
+        if (overlapsLauncherColumn) {
+            bottomLimit = Math.min(bottomLimit, launcherRect.top - CHATBOT_LAUNCHER_GAP);
+            const availableHeight = Math.max(260, bottomLimit - minTop);
+            chatbotContainer.style.maxHeight = `${availableHeight}px`;
+            rect = chatbotContainer.getBoundingClientRect();
+        } else {
+            chatbotContainer.style.maxHeight = "";
+        }
+
         const maxLeft = Math.max(minLeft, viewportWidth - rect.width - CHATBOT_VIEWPORT_MARGIN);
-        const maxTop = Math.max(minTop, viewportHeight - rect.height - CHATBOT_VIEWPORT_MARGIN);
+        const maxTop = Math.max(minTop, bottomLimit - rect.height);
         const nextLeft = Math.min(Math.max(rect.left, minLeft), maxLeft);
         const nextTop = Math.min(Math.max(rect.top, minTop), maxTop);
 
