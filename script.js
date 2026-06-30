@@ -239,36 +239,38 @@ const createBotModel = () => {
     micTip.position.set(0.3, 0.03, 0.66);
     mascot.add(micTip);
 
-    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.46, 18), accentMaterial);
-    leftArm.position.set(-0.6, -0.16, 0.08);
-    leftArm.rotation.z = -0.78;
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.5, 18), accentMaterial);
+    leftArm.position.set(-0.64, -0.12, 0.46);
+    leftArm.rotation.set(0.2, 0.18, -0.72);
     mascot.add(leftArm);
 
-    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.52, 18), accentMaterial);
-    rightArm.position.set(0.61, 0.02, 0.08);
-    rightArm.rotation.z = 0.95;
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.52, 18), accentMaterial);
+    rightArm.position.set(0.64, 0.06, 0.48);
+    rightArm.rotation.set(-0.1, -0.16, 0.84);
     mascot.add(rightArm);
 
-    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14), helperMaterial);
-    leftHand.position.set(-0.78, -0.34, 0.12);
+    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 16), helperMaterial);
+    leftHand.scale.set(1.08, 0.94, 1.08);
+    leftHand.position.set(-0.86, -0.29, 0.58);
     mascot.add(leftHand);
 
-    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.095, 20, 14), helperMaterial);
-    rightHand.position.set(0.82, 0.22, 0.12);
+    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 16), helperMaterial);
+    rightHand.scale.set(1.08, 0.94, 1.08);
+    rightHand.position.set(0.86, 0.24, 0.58);
     mascot.add(rightHand);
 
     const bubbleGroup = new THREE.Group();
     const bubblePanel = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 0.045), bubbleMaterial);
-    bubblePanel.position.set(0.96, 0.68, 0.2);
+    bubblePanel.position.set(1.02, 0.7, 0.34);
     bubbleGroup.add(bubblePanel);
 
     const bubbleTail = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 3), bubbleMaterial);
-    bubbleTail.position.set(0.72, 0.54, 0.2);
+    bubbleTail.position.set(0.76, 0.56, 0.34);
     bubbleTail.rotation.set(0, 0, -0.92);
     bubbleGroup.add(bubbleTail);
 
     const dotOne = new THREE.Mesh(new THREE.SphereGeometry(0.025, 12, 8), accentMaterial);
-    dotOne.position.set(0.84, 0.68, 0.24);
+    dotOne.position.set(0.9, 0.7, 0.39);
     bubbleGroup.add(dotOne);
 
     const dotTwo = dotOne.clone();
@@ -289,7 +291,7 @@ const createBotModel = () => {
     platform.rotation.x = Math.PI / 2;
     mascot.add(platform);
 
-    mascot.userData = { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup };
+    mascot.userData = { leftArm, rightArm, leftHand, rightHand, micTip, helperOrb, platform, bubbleGroup };
     return mascot;
 };
 
@@ -339,16 +341,19 @@ const initChatbot3D = () => {
             restBlend += ((shouldRest ? 1 : 0) - restBlend) * 0.08;
             const motionScale = isMascot ? 1 : 1 - restBlend;
             const trickBoost = isMascot ? 1.35 : 0.9;
-            const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
+            const { leftArm, rightArm, leftHand, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
 
             bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05) * motionScale;
             bot.rotation.x = Math.sin(time * 1.4) * 0.08 * motionScale;
             bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24) * motionScale;
             bot.rotation.z = Math.sin(time * 1.8) * 0.08 * motionScale;
 
-            leftArm.rotation.z = -0.78 + Math.sin(time * 2.6) * 0.18 * trickBoost * motionScale;
-            rightArm.rotation.z = 0.95 + Math.sin(time * 3.4) * 0.32 * trickBoost * motionScale;
-            rightHand.position.y = 0.22 + Math.sin(time * 3.4) * 0.08 * trickBoost * motionScale;
+            leftArm.rotation.z = -0.72 + Math.sin(time * 2.6) * 0.12 * trickBoost * motionScale;
+            rightArm.rotation.z = 0.84 + Math.sin(time * 3.4) * 0.2 * trickBoost * motionScale;
+            leftHand.position.y = -0.29 + Math.sin(time * 2.6) * 0.035 * trickBoost * motionScale;
+            leftHand.position.z = 0.58 + Math.cos(time * 2.2) * 0.018 * trickBoost * motionScale;
+            rightHand.position.y = 0.24 + Math.sin(time * 3.4) * 0.06 * trickBoost * motionScale;
+            rightHand.position.z = 0.58 + Math.cos(time * 2.7) * 0.018 * trickBoost * motionScale;
             micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12 * motionScale);
             helperOrb.rotation.x += 0.026 * motionScale;
             helperOrb.rotation.y += 0.036 * motionScale;
