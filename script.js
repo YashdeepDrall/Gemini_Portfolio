@@ -482,6 +482,7 @@ if (chatCloseBtn && chatbox) {
     expandBtn.classList.add("expand-btn");
     expandBtn.innerHTML = expandIcon;
     expandBtn.setAttribute("aria-label", "Expand chatbot");
+    expandBtn.setAttribute("aria-pressed", "false");
     expandBtn.setAttribute("data-tooltip", "Expand");
     chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
@@ -490,10 +491,12 @@ if (chatCloseBtn && chatbox) {
         if (chatbotContainer.classList.contains("expanded")) {
             expandBtn.innerHTML = collapseIcon;
             expandBtn.setAttribute("aria-label", "Collapse chatbot");
+            expandBtn.setAttribute("aria-pressed", "true");
             expandBtn.setAttribute("data-tooltip", "Collapse");
         } else {
             expandBtn.innerHTML = expandIcon;
             expandBtn.setAttribute("aria-label", "Expand chatbot");
+            expandBtn.setAttribute("aria-pressed", "false");
             expandBtn.setAttribute("data-tooltip", "Expand");
         }
         chatbox.scrollTo(0, chatbox.scrollHeight);
