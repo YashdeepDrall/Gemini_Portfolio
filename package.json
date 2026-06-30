@@ -7,7 +7,7 @@
     "lint": "node scripts/validate.js",
     "typecheck": "node --check script.js",
     "test": "npm run lint",
-    "build": "npm run lint && npm run typecheck"
+    "build": "npm run lint && npm run typecheck && node scripts/build-static.js"
   },
   "devDependencies": {}
 }
