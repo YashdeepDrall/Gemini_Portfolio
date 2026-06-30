@@ -473,7 +473,16 @@ if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
     const CHATBOT_VIEWPORT_MARGIN = 12;
 
-    clampChatbotToViewport = () => {
+    const lockChatbotPosition = () => {
+        const rect = chatbotContainer.getBoundingClientRect();
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${rect.left}px`;
+        chatbotContainer.style.top = `${rect.top}px`;
+        return rect;
+    };
+
+    clampChatbotToViewport = ({ preserveTop = false } = {}) => {
         if (!chatbotContainer || !document.body.classList.contains("show-chatbot")) return;
 
         chatbotContainer.style.maxHeight = "";
@@ -481,13 +490,14 @@ if (chatCloseBtn && chatbox) {
         const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom || 0;
         const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
         const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
-        const mascotOffset = 68;
+        const mascotOffset = 58;
         const minLeft = CHATBOT_VIEWPORT_MARGIN;
         const minTop = headerBottom + mascotOffset;
         const maxLeft = Math.max(minLeft, viewportWidth - rect.width - CHATBOT_VIEWPORT_MARGIN);
         const maxTop = Math.max(minTop, viewportHeight - rect.height - CHATBOT_VIEWPORT_MARGIN);
         const nextLeft = Math.min(Math.max(rect.left, minLeft), maxLeft);
-        const nextTop = Math.min(Math.max(rect.top, minTop), maxTop);
+        const canKeepTop = preserveTop && rect.top >= minTop && rect.top <= maxTop;
+        const nextTop = canKeepTop ? rect.top : Math.min(Math.max(rect.top, minTop), maxTop);
 
         chatbotContainer.style.right = "auto";
         chatbotContainer.style.bottom = "auto";
@@ -495,13 +505,13 @@ if (chatCloseBtn && chatbox) {
         chatbotContainer.style.top = `${nextTop}px`;
     };
 
-    scheduleChatbotViewportClamp = () => {
+    scheduleChatbotViewportClamp = (options) => {
         if (chatbotClampFrame) {
             cancelAnimationFrame(chatbotClampFrame);
         }
         chatbotClampFrame = requestAnimationFrame(() => {
             chatbotClampFrame = null;
-            clampChatbotToViewport();
+            clampChatbotToViewport(options);
         });
     };
 
@@ -523,6 +533,7 @@ if (chatCloseBtn && chatbox) {
     chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
     expandBtn.addEventListener("click", () => {
+        lockChatbotPosition();
         chatbotContainer.classList.toggle("expanded");
         if (chatbotContainer.classList.contains("expanded")) {
             expandBtn.innerHTML = collapseIcon;
@@ -535,7 +546,7 @@ if (chatCloseBtn && chatbox) {
             expandBtn.setAttribute("aria-pressed", "false");
             expandBtn.setAttribute("data-tooltip", "Expand");
         }
-        scheduleChatbotViewportClamp();
+        scheduleChatbotViewportClamp({ preserveTop: true });
         chatbox.scrollTo(0, chatbox.scrollHeight);
     });
 
@@ -566,11 +577,7 @@ if (chatCloseBtn && chatbox) {
             isDragging = true;
             chatbotContainer.style.transition = "none";
 
-            const rect = chatbotContainer.getBoundingClientRect();
-            chatbotContainer.style.right = "auto";
-            chatbotContainer.style.bottom = "auto";
-            chatbotContainer.style.left = `${rect.left}px`;
-            chatbotContainer.style.top = `${rect.top}px`;
+            const rect = lockChatbotPosition();
 
             startX = event.clientX;
             startY = event.clientY;
