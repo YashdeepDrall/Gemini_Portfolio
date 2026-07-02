@@ -497,12 +497,10 @@ if (chatCloseBtn && chatbox) {
 
         chatbotContainer.style.maxHeight = "";
         const rect = chatbotContainer.getBoundingClientRect();
-        const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom || 0;
         const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
         const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
-        const mascotOffset = 58;
         const minLeft = CHATBOT_VIEWPORT_MARGIN;
-        const minTop = headerBottom + mascotOffset;
+        const minTop = CHATBOT_VIEWPORT_MARGIN;
         const maxLeft = Math.max(minLeft, viewportWidth - rect.width - CHATBOT_VIEWPORT_MARGIN);
         const maxTop = Math.max(minTop, viewportHeight - rect.height - CHATBOT_VIEWPORT_MARGIN);
         const nextLeft = Math.min(Math.max(rect.left, minLeft), maxLeft);
