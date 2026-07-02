@@ -5,6 +5,18 @@ if (document.getElementById("element") && typeof Typed !== "undefined") {
     });
 }
 
+const setSidebarState = (isOpen) => {
+    const sidebar = document.getElementById("sidebar");
+    const hamburgerMenu = document.getElementById("hamburgerMenu");
+
+    if (!sidebar) return;
+
+    sidebar.classList.toggle("active", isOpen);
+    if (hamburgerMenu) {
+        hamburgerMenu.setAttribute("aria-expanded", String(isOpen));
+    }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     const currentPage = window.location.pathname.split("/").pop();
     const navLinks = document.querySelectorAll("nav .nav-link");
@@ -31,14 +43,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const hamburgerMenu = document.getElementById("hamburgerMenu");
     if (hamburgerMenu) {
         hamburgerMenu.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.add("active");
+            setSidebarState(true);
         });
     }
 
     const closeSidebar = document.getElementById("closeSidebar");
     if (closeSidebar) {
         closeSidebar.addEventListener("click", function () {
-            document.getElementById("sidebar").classList.remove("active");
+            setSidebarState(false);
         });
     }
 });
@@ -52,24 +64,24 @@ if (!document.querySelector(".chatbot-toggler")) {
                 <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="Open chatbot">
             </span>
         </button>
-        <div class="chatbot-container">
+        <div class="chatbot-container" role="dialog" aria-label="AI Assistant" aria-hidden="true">
             <div class="chatbot-mascot" aria-hidden="true">
                 <div class="bot-3d-stage bot-3d-mascot" data-bot-3d="mascot">
                     <img class="bot-3d-fallback" src="IIRIS_LOGO.png" alt="">
                 </div>
             </div>
             <header class="chatbot-header">
-                <h2>Chatbot</h2>
-                <span class="chat-close-btn">
+                <h2>AI Assistant</h2>
+                <button class="chat-close-btn" type="button" aria-label="Close chatbot" data-tooltip="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </span>
+                </button>
             </header>
             <ul class="chatbox">
                 <li class="chat incoming">
                     <img class="chatbot-avatar" src="IIRIS_LOGO.png" alt="IIRIS assistant">
                     <div class="message-content">
                         <div class="chat-message">
-                            <p>👋 Welcome to IIRIS.</p>
+                            <p>Welcome to IIRIS.</p>
                             <p>Here to help with information on our:</p>
                             <ul>
                                 <li>services</li>
@@ -86,9 +98,9 @@ if (!document.querySelector(".chatbot-toggler")) {
             </ul>
             <div class="chat-input">
                 <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
-                <span id="send-btn" class="material-symbols-rounded">
+                <button id="send-btn" class="send-chat-btn" type="button" aria-label="Send message">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </span>
+                </button>
             </div>
         </div>
     `
@@ -103,6 +115,19 @@ const chatbox = document.querySelector(".chatbox");
 const chatbotContainer = document.querySelector(".chatbot-container");
 const CHAT_HISTORY_KEY = "chat_history";
 const API_BASE_URL = "https://iiris-bot.vercel.app";
+let clampChatbotToViewport = () => {};
+let scheduleChatbotViewportClamp = () => {};
+let chatbotClampFrame = null;
+
+const setChatbotState = (isOpen) => {
+    document.body.classList.toggle("show-chatbot", isOpen);
+    if (chatbotContainer) {
+        chatbotContainer.setAttribute("aria-hidden", String(!isOpen));
+    }
+    if (chatbotToggler) {
+        chatbotToggler.setAttribute("aria-label", isOpen ? "Close chatbot" : "Open chatbot");
+    }
+};
 
 const createBotModel = () => {
     const { THREE } = window;
@@ -217,36 +242,38 @@ const createBotModel = () => {
     micTip.position.set(0.3, 0.03, 0.66);
     mascot.add(micTip);
 
-    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.46, 18), accentMaterial);
-    leftArm.position.set(-0.6, -0.16, 0.08);
-    leftArm.rotation.z = -0.78;
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.42, 18), accentMaterial);
+    leftArm.position.set(-0.6, -0.06, 0.5);
+    leftArm.rotation.set(0.18, 0.08, -0.9);
     mascot.add(leftArm);
 
-    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.52, 18), accentMaterial);
-    rightArm.position.set(0.61, 0.02, 0.08);
-    rightArm.rotation.z = 0.95;
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.42, 18), accentMaterial);
+    rightArm.position.set(0.6, -0.06, 0.5);
+    rightArm.rotation.set(0.18, -0.08, 0.9);
     mascot.add(rightArm);
 
-    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14), helperMaterial);
-    leftHand.position.set(-0.78, -0.34, 0.12);
+    const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), helperMaterial);
+    leftHand.scale.set(1.08, 0.92, 1.08);
+    leftHand.position.set(-0.78, -0.22, 0.62);
     mascot.add(leftHand);
 
-    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.095, 20, 14), helperMaterial);
-    rightHand.position.set(0.82, 0.22, 0.12);
+    const rightHand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), helperMaterial);
+    rightHand.scale.set(1.08, 0.92, 1.08);
+    rightHand.position.set(0.78, -0.22, 0.62);
     mascot.add(rightHand);
 
     const bubbleGroup = new THREE.Group();
     const bubblePanel = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.28, 0.045), bubbleMaterial);
-    bubblePanel.position.set(0.96, 0.68, 0.2);
+    bubblePanel.position.set(1.02, 0.7, 0.34);
     bubbleGroup.add(bubblePanel);
 
     const bubbleTail = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 3), bubbleMaterial);
-    bubbleTail.position.set(0.72, 0.54, 0.2);
+    bubbleTail.position.set(0.76, 0.56, 0.34);
     bubbleTail.rotation.set(0, 0, -0.92);
     bubbleGroup.add(bubbleTail);
 
     const dotOne = new THREE.Mesh(new THREE.SphereGeometry(0.025, 12, 8), accentMaterial);
-    dotOne.position.set(0.84, 0.68, 0.24);
+    dotOne.position.set(0.9, 0.7, 0.39);
     bubbleGroup.add(dotOne);
 
     const dotTwo = dotOne.clone();
@@ -267,7 +294,7 @@ const createBotModel = () => {
     platform.rotation.x = Math.PI / 2;
     mascot.add(platform);
 
-    mascot.userData = { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup };
+    mascot.userData = { leftArm, rightArm, leftHand, rightHand, micTip, helperOrb, platform, bubbleGroup };
     return mascot;
 };
 
@@ -317,16 +344,19 @@ const initChatbot3D = () => {
             restBlend += ((shouldRest ? 1 : 0) - restBlend) * 0.08;
             const motionScale = isMascot ? 1 : 1 - restBlend;
             const trickBoost = isMascot ? 1.35 : 0.9;
-            const { leftArm, rightArm, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
+            const { leftArm, rightArm, leftHand, rightHand, micTip, helperOrb, platform, bubbleGroup } = bot.userData;
 
             bot.position.y = Math.sin(time * 2.1) * (isMascot ? 0.1 : 0.05) * motionScale;
             bot.rotation.x = Math.sin(time * 1.4) * 0.08 * motionScale;
             bot.rotation.y = Math.sin(time * 1.05) * (isMascot ? 0.34 : 0.24) * motionScale;
             bot.rotation.z = Math.sin(time * 1.8) * 0.08 * motionScale;
 
-            leftArm.rotation.z = -0.78 + Math.sin(time * 2.6) * 0.18 * trickBoost * motionScale;
-            rightArm.rotation.z = 0.95 + Math.sin(time * 3.4) * 0.32 * trickBoost * motionScale;
-            rightHand.position.y = 0.22 + Math.sin(time * 3.4) * 0.08 * trickBoost * motionScale;
+            leftArm.rotation.z = -0.9 + Math.sin(time * 2.4) * 0.08 * trickBoost * motionScale;
+            rightArm.rotation.z = 0.9 + Math.sin(time * 2.7) * 0.08 * trickBoost * motionScale;
+            leftHand.position.y = -0.22 + Math.sin(time * 2.4) * 0.025 * trickBoost * motionScale;
+            leftHand.position.x = -0.78 + Math.cos(time * 2.1) * 0.012 * trickBoost * motionScale;
+            rightHand.position.y = -0.22 + Math.sin(time * 2.7) * 0.025 * trickBoost * motionScale;
+            rightHand.position.x = 0.78 + Math.cos(time * 2.3) * 0.012 * trickBoost * motionScale;
             micTip.scale.setScalar(1 + Math.sin(time * 5.2) * 0.12 * motionScale);
             helperOrb.rotation.x += 0.026 * motionScale;
             helperOrb.rotation.y += 0.036 * motionScale;
@@ -390,13 +420,23 @@ const saveChatHistory = () => {
         messages.push({ message, className, chatId });
     });
 
-    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    try {
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    } catch (error) {
+        console.error("Unable to save chat history:", error);
+    }
 };
 
 const loadChatHistory = () => {
     if (!chatbox) return;
 
-    const storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    let storedHistory;
+    try {
+        storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    } catch (error) {
+        console.error("Unable to read chat history:", error);
+        return;
+    }
     if (!storedHistory) return;
 
     let history;
@@ -404,7 +444,11 @@ const loadChatHistory = () => {
         history = JSON.parse(storedHistory);
     } catch (error) {
         console.error("Invalid chat history in localStorage:", error);
-        localStorage.removeItem(CHAT_HISTORY_KEY);
+        try {
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+        } catch (storageError) {
+            console.error("Unable to remove invalid chat history:", storageError);
+        }
         return;
     }
 
@@ -427,29 +471,99 @@ const loadChatHistory = () => {
 
 if (chatCloseBtn && chatbox) {
     chatCloseBtn.setAttribute("data-tooltip", "Close");
+    const CHATBOT_VIEWPORT_MARGIN = 12;
+    let collapsedPositionBeforeExpand = null;
 
-    const clearChatBtn = document.createElement("span");
+    const lockChatbotPosition = () => {
+        const rect = chatbotContainer.getBoundingClientRect();
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${rect.left}px`;
+        chatbotContainer.style.top = `${rect.top}px`;
+        return rect;
+    };
+
+    const restoreChatbotPosition = (position) => {
+        if (!position) return;
+
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${position.left}px`;
+        chatbotContainer.style.top = `${position.top}px`;
+    };
+
+    clampChatbotToViewport = ({ preserveTop = false } = {}) => {
+        if (!chatbotContainer || !document.body.classList.contains("show-chatbot")) return;
+
+        chatbotContainer.style.maxHeight = "";
+        const rect = chatbotContainer.getBoundingClientRect();
+        const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+        const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+        const minLeft = CHATBOT_VIEWPORT_MARGIN;
+        const minTop = CHATBOT_VIEWPORT_MARGIN;
+        const maxLeft = Math.max(minLeft, viewportWidth - rect.width - CHATBOT_VIEWPORT_MARGIN);
+        const maxTop = Math.max(minTop, viewportHeight - rect.height - CHATBOT_VIEWPORT_MARGIN);
+        const nextLeft = Math.min(Math.max(rect.left, minLeft), maxLeft);
+        const canKeepTop = preserveTop && rect.top >= minTop && rect.top <= maxTop;
+        const nextTop = canKeepTop ? rect.top : Math.min(Math.max(rect.top, minTop), maxTop);
+
+        chatbotContainer.style.right = "auto";
+        chatbotContainer.style.bottom = "auto";
+        chatbotContainer.style.left = `${nextLeft}px`;
+        chatbotContainer.style.top = `${nextTop}px`;
+    };
+
+    scheduleChatbotViewportClamp = (options) => {
+        if (chatbotClampFrame) {
+            cancelAnimationFrame(chatbotClampFrame);
+        }
+        chatbotClampFrame = requestAnimationFrame(() => {
+            chatbotClampFrame = null;
+            clampChatbotToViewport(options);
+        });
+    };
+
+    const clearChatBtn = document.createElement("button");
+    clearChatBtn.type = "button";
     clearChatBtn.textContent = "Clear Chat";
     clearChatBtn.classList.add("clear-chat-btn");
     chatCloseBtn.parentNode.insertBefore(clearChatBtn, chatCloseBtn);
 
-    const expandBtn = document.createElement("span");
+    const expandBtn = document.createElement("button");
+    expandBtn.type = "button";
     const expandIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5"/><path d="M3 3l7 7"/><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/><path d="M16 21h5v-5"/><path d="M21 21l-7-7"/></svg>`;
     const collapseIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M10 14l-7 7"/><path d="M20 14h-6v6"/><path d="M14 14l7 7"/><path d="M4 10h6V4"/><path d="M10 10L3 3"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/></svg>`;
     expandBtn.classList.add("expand-btn");
     expandBtn.innerHTML = expandIcon;
+    expandBtn.setAttribute("aria-label", "Expand chatbot");
+    expandBtn.setAttribute("aria-pressed", "false");
     expandBtn.setAttribute("data-tooltip", "Expand");
     chatCloseBtn.parentNode.insertBefore(expandBtn, chatCloseBtn);
 
     expandBtn.addEventListener("click", () => {
-        chatbotContainer.classList.toggle("expanded");
-        if (chatbotContainer.classList.contains("expanded")) {
-            expandBtn.innerHTML = collapseIcon;
-            expandBtn.setAttribute("data-tooltip", "Collapse");
-        } else {
+        const wasExpanded = chatbotContainer.classList.contains("expanded");
+        const currentPosition = lockChatbotPosition();
+
+        if (wasExpanded) {
+            chatbotContainer.classList.remove("expanded");
+            restoreChatbotPosition(collapsedPositionBeforeExpand);
+            collapsedPositionBeforeExpand = null;
             expandBtn.innerHTML = expandIcon;
+            expandBtn.setAttribute("aria-label", "Expand chatbot");
+            expandBtn.setAttribute("aria-pressed", "false");
             expandBtn.setAttribute("data-tooltip", "Expand");
+        } else {
+            collapsedPositionBeforeExpand = {
+                left: currentPosition.left,
+                top: currentPosition.top,
+            };
+            chatbotContainer.classList.add("expanded");
+            expandBtn.innerHTML = collapseIcon;
+            expandBtn.setAttribute("aria-label", "Collapse chatbot");
+            expandBtn.setAttribute("aria-pressed", "true");
+            expandBtn.setAttribute("data-tooltip", "Collapse");
         }
+        scheduleChatbotViewportClamp({ preserveTop: true });
         chatbox.scrollTo(0, chatbox.scrollHeight);
     });
 
@@ -469,6 +583,7 @@ if (chatCloseBtn && chatbox) {
     const stopDrag = () => {
         isDragging = false;
         chatbotContainer.style.transition = "";
+        scheduleChatbotViewportClamp();
         document.removeEventListener("mousemove", onDrag);
         document.removeEventListener("mouseup", stopDrag);
     };
@@ -478,12 +593,11 @@ if (chatCloseBtn && chatbox) {
             if (event.target.closest("span") || event.target.closest("button")) return;
             isDragging = true;
             chatbotContainer.style.transition = "none";
+            if (chatbotContainer.classList.contains("expanded")) {
+                collapsedPositionBeforeExpand = null;
+            }
 
-            const rect = chatbotContainer.getBoundingClientRect();
-            chatbotContainer.style.right = "auto";
-            chatbotContainer.style.bottom = "auto";
-            chatbotContainer.style.left = `${rect.left}px`;
-            chatbotContainer.style.top = `${rect.top}px`;
+            const rect = lockChatbotPosition();
 
             startX = event.clientX;
             startY = event.clientY;
@@ -495,9 +609,15 @@ if (chatCloseBtn && chatbox) {
         });
     }
 
+    window.addEventListener("resize", scheduleChatbotViewportClamp);
+
     const initialChatContent = chatbox.innerHTML;
     clearChatBtn.addEventListener("click", () => {
-        localStorage.removeItem(CHAT_HISTORY_KEY);
+        try {
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+        } catch (error) {
+            console.error("Unable to clear chat history:", error);
+        }
         chatbox.innerHTML = initialChatContent;
     });
 }
@@ -577,13 +697,29 @@ const createChatLi = (message, className) => {
                 feedbackText.textContent = "";
             } else {
                 const text = chatLi.querySelector(".chat-message").textContent;
-                navigator.clipboard.writeText(text).then(() => {
-                    copyBtn.classList.add("active");
-                    feedbackText.textContent = "Response copied";
+                if (!navigator.clipboard) {
+                    feedbackText.textContent = "Copy is unavailable";
                     setTimeout(() => {
                         feedbackText.textContent = "";
                     }, 2000);
-                });
+                    return;
+                }
+
+                navigator.clipboard
+                    .writeText(text)
+                    .then(() => {
+                        copyBtn.classList.add("active");
+                        feedbackText.textContent = "Response copied";
+                        setTimeout(() => {
+                            feedbackText.textContent = "";
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        feedbackText.textContent = "Copy failed";
+                        setTimeout(() => {
+                            feedbackText.textContent = "";
+                        }, 2000);
+                    });
             }
         });
     }
@@ -658,10 +794,10 @@ const handleChat = () => {
     setTimeout(() => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
         const messageElement = incomingChatLi.querySelector(".chat-message");
-        messageElement.innerHTML = `<div class="typing-animation">
-            <div class="typing-dot" style="--delay: 0.2s"></div>
-            <div class="typing-dot" style="--delay: 0.3s"></div>
-            <div class="typing-dot" style="--delay: 0.4s"></div>
+        messageElement.innerHTML = `<div class="typing-animation" aria-label="Assistant is typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
         </div>`;
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -685,19 +821,32 @@ if (chatInput) {
 
 if (sendChatBtn) sendChatBtn.addEventListener("click", handleChat);
 if (chatbotToggler) {
-    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+    chatbotToggler.addEventListener("click", () => {
+        setChatbotState(!document.body.classList.contains("show-chatbot"));
+    });
 }
 if (chatCloseBtn) {
-    chatCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+    chatCloseBtn.addEventListener("click", () => setChatbotState(false));
 }
 
 if (chatbox) {
     loadChatHistory();
 }
 
-if (!sessionStorage.getItem("chatbotOpened")) {
+let hasOpenedChatbot = false;
+try {
+    hasOpenedChatbot = sessionStorage.getItem("chatbotOpened") === "true";
+} catch (error) {
+    console.error("Unable to read chatbot session state:", error);
+}
+
+if (!hasOpenedChatbot) {
     setTimeout(() => {
-        document.body.classList.add("show-chatbot");
-        sessionStorage.setItem("chatbotOpened", "true");
+        setChatbotState(true);
+        try {
+            sessionStorage.setItem("chatbotOpened", "true");
+        } catch (error) {
+            console.error("Unable to save chatbot session state:", error);
+        }
     }, 3000);
 }
